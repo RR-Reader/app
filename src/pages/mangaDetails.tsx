@@ -3,8 +3,6 @@ import { useParams } from "react-router-dom";
 export default function MangaDetail() {
   const { identifier, provider } = useParams();
 
-  console.log(identifier, provider);
-
   const manga: {
     title: string;
     provider: string;
@@ -19,10 +17,9 @@ export default function MangaDetail() {
   }
 
   return (
-    <div>
-      <h1>Manga Details</h1>
+    <>
       <h2>Manga Title: {manga.title}</h2>
       <h2>Manga Provider: {manga.provider}</h2>
-    </div>
+    </>
   );
 }
