@@ -98,6 +98,7 @@ pub fn extract_latest_entries(
                     identifier,
                     title,
                     cover_url,
+                    source: "batoto".to_string(),
                 };
 
                 entries.push(entry);
@@ -208,6 +209,7 @@ pub fn extract_popular_entries(
                     title,
                     identifier,
                     cover_url,
+                    source: "batoto".to_string(),
                 };
 
                 entries.push(entry);

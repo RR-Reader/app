@@ -3,6 +3,8 @@ import Layout from "./components/layout";
 import Home from "@/pages/home";
 import Settings from "@/pages/settings";
 import MangaDetail from "@/pages/mangaDetails";
+import Explore from "./pages/explore";
+import Search from "./pages/search";
 
 export const routes = createBrowserRouter([
   {
@@ -20,6 +22,14 @@ export const routes = createBrowserRouter([
       {
         path: "manga/:provider/:identifier",
         element: <MangaDetail />,
+      },
+      {
+        path: "explore",
+        element: <Explore />,
+      },
+      {
+        path: "search",
+        element: <Search />,
       },
     ],
   },

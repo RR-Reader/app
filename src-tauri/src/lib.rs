@@ -9,7 +9,7 @@ use std::sync::Arc;
 use tauri::{command, State};
 
 use crate::extensions::sources::batoto::{
-    lists::{get_latest_releases, get_popular_releases},
+    lists::get_explore_page,
     manga::get_manga_details,
 };
 
@@ -29,19 +29,24 @@ async fn get_cache_stats(cache: State<'_, EntryCache>) -> Result<(u64, u64), Str
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let manga_cache: EntryCache = Cache::builder()
+    let entry_cache: EntryCache = Cache::builder()
+        .max_capacity(1000)
+        .time_to_live(std::time::Duration::from_secs(3600))
+        .build();
+
+    let manga_cache: MangaCache = Cache::builder()
         .max_capacity(1000)
         .time_to_live(std::time::Duration::from_secs(3600))
         .build();
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .manage(entry_cache)
         .manage(manga_cache)
         .invoke_handler(tauri::generate_handler![
             clean_manga_cache,
             get_cache_stats,
-            get_popular_releases,
-            get_latest_releases,
+            get_explore_page,
             get_manga_details
         ])
         .run(tauri::generate_context!())

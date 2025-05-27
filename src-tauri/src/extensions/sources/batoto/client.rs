@@ -1,11 +1,11 @@
 use super::parser::{
-    extract_latest_entries, extract_latest_titles, extract_popular_entries, extract_popular_titles,
-    extract_series_details, extract_id_from_url,
+    construct_url_from_id, extract_latest_entries, extract_latest_titles, extract_popular_entries,
+    extract_popular_titles, extract_series_details,
 };
 use crate::{
     structs::{Manga, MangaEntry},
     utils::{get_cached_data, ScrapingError},
-    {EntryCache, MangaCache},
+    EntryCache, MangaCache,
 };
 use reqwest::Client;
 use std::sync::Arc;
@@ -32,7 +32,7 @@ impl BatotoClient {
 
     pub async fn get_popular_manga(
         &self,
-        cache: State<'_, EntryCache>,
+        cache: &State<'_, EntryCache>,
         limit: usize,
     ) -> Result<Vec<Arc<MangaEntry>>, String> {
         let html_content: String = self
@@ -81,7 +81,7 @@ impl BatotoClient {
 
     pub async fn get_latest_manga(
         &self,
-        cache: State<'_, EntryCache>,
+        cache: &State<'_, EntryCache>,
         limit: usize,
     ) -> Result<Vec<Arc<MangaEntry>>, String> {
         let html_content: String = self
@@ -131,12 +131,11 @@ impl BatotoClient {
     pub async fn get_manga_details(
         &self,
         cache: State<'_, MangaCache>,
-        url: &str,
+        identifier: &str,
     ) -> Result<Arc<Manga>, String> {
-        let identifier = extract_id_from_url(url)
-            .ok_or_else(|| "Failed to extract series ID from URL".to_string())?;
+        let url: String = construct_url_from_id(identifier);
 
-        if let Some(cached) = cache.get(&identifier).await {
+        if let Some(cached) = cache.get(&identifier.to_string()).await {
             return Ok(cached);
         }
 
@@ -150,10 +149,12 @@ impl BatotoClient {
             .await
             .map_err(|e| ScrapingError::NetworkError(format!("Failed to read response: {}", e)))?;
 
-        let entry: Manga = extract_series_details(&html_content, &url)?;
+        let entry: Manga = extract_series_details(&html_content, &identifier)?;
         let arc_entry: Arc<Manga> = Arc::new(entry);
 
-        cache.insert(identifier, Arc::clone(&arc_entry)).await;
+        cache
+            .insert(identifier.to_string(), Arc::clone(&arc_entry))
+            .await;
 
         Ok(arc_entry)
     }

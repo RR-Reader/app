@@ -11,9 +11,15 @@ import {
   SidebarHeader as ShadSidebarHeader,
   useSidebar,
 } from "./ui/sidebar";
-import { HomeIcon, AdjustmentsHorizontalIcon } from "@heroicons/react/24/solid";
 import { cn } from "@/lib/utils";
 import { useLocation } from "react-router";
+import {
+  type LucideIcon,
+  Search,
+  Compass,
+  Home,
+  SlidersHorizontal,
+} from "lucide-react";
 
 function SidebarHeader() {
   const { open } = useSidebar();
@@ -35,18 +41,28 @@ export function Sidebar() {
   const { pathname } = useLocation();
   type SidebarPath = {
     title: string;
-    items: { name: string; path: string; icon?: JSX.Element }[];
+    items: { name: string; path: string; icon?: LucideIcon }[];
   };
 
   const sidebarPaths: SidebarPath[] = [
     {
       title: "Content",
       items: [
-        { name: "Home", path: "/", icon: <HomeIcon /> },
+        { name: "Home", path: "/", icon: Home },
+        {
+          name: "Explore",
+          path: "/explore",
+          icon: Compass,
+        },
+        {
+          name: "Search",
+          path: "/search",
+          icon: Search,
+        },
         {
           name: "Settings",
           path: "/settings",
-          icon: <AdjustmentsHorizontalIcon />,
+          icon: SlidersHorizontal,
         },
       ],
     },
@@ -76,7 +92,7 @@ export function Sidebar() {
                           pathname === link.path && "bg-accent/50",
                         )}
                       >
-                        {link.icon}
+                        {link.icon && <link.icon />}
                         {link.name}
                       </SidebarMenuButton>
                     </Link>

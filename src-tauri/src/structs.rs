@@ -1,7 +1,10 @@
+use std::sync::Arc;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MangaEntry {
+    pub source: String,
     pub identifier: String,
     pub title: String,
     pub cover_url: String,
@@ -30,4 +33,16 @@ pub struct ChapterEntry {
 pub struct Chapter {
     pub url: String,
     pub pages: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ExploreSection {
+    pub title: String,
+    pub entries: Vec<Arc<MangaEntry>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ExplorePage {
+    pub source: String,
+    pub sections: Vec<ExploreSection>,
 }

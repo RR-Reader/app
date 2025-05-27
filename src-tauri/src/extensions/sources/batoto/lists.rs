@@ -1,24 +1,26 @@
 use super::client::BatotoClient;
-use crate::{structs::MangaEntry, EntryCache};
-use std::sync::Arc;
+use crate::{
+    structs::{ExplorePage, ExploreSection},
+    EntryCache,
+};
 use tauri::{command, State};
 
 #[command]
-pub async fn get_popular_releases(
-    cache: State<'_, EntryCache>,
-) -> Result<Vec<Arc<MangaEntry>>, String> {
+pub async fn get_explore_page(cache: State<'_, EntryCache>) -> Result<ExplorePage, String> {
     let client: BatotoClient = BatotoClient::new();
-    let manga_list: Vec<Arc<MangaEntry>> = client.get_popular_manga(cache, 16).await?;
 
-    Ok(manga_list)
-}
+    let popular_section = ExploreSection {
+        title: "Popular Releases".to_string(),
+        entries: client.get_popular_manga(&cache, 16).await?,
+    };
 
-#[command]
-pub async fn get_latest_releases(
-    cache: State<'_, EntryCache>,
-) -> Result<Vec<Arc<MangaEntry>>, String> {
-    let client: BatotoClient = BatotoClient::new();
-    let manga_list: Vec<Arc<MangaEntry>> = client.get_latest_manga(cache, 16).await?;
+    let latest_section = ExploreSection {
+        title: "Latest Releases".to_string(),
+        entries: client.get_latest_manga(&cache, 36).await?,
+    };
 
-    Ok(manga_list)
+    Ok(ExplorePage {
+        source: "batoto".to_string(),
+        sections: vec![popular_section, latest_section],
+    })
 }
