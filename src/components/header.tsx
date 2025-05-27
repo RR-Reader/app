@@ -1,14 +1,5 @@
 import { matchPath, useLocation, useNavigate } from "react-router";
-import { Separator } from "./ui/separator";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "./ui/select";
 import { useSidebar } from "./ui/sidebar";
-import { useLayoutStore } from "@/stores/layoutStore";
 import { ModeToggle } from "./theme-toggle";
 import { Button } from "./ui/button";
 import {
@@ -16,16 +7,24 @@ import {
   SidebarOpen,
   ChevronLeft,
   ChevronRight,
+  RefreshCcw,
 } from "lucide-react";
+import { getExplorePage } from "@/hooks/queries";
+import { useParams } from "react-router";
 
 function Header() {
   const { pathname } = useLocation();
   const { setOpen, open } = useSidebar();
   const navigate = useNavigate();
 
+  const { source } = useParams<{ source: string }>();
+
+  const { refetch } = getExplorePage(source || undefined);
+
   const routes: { path: string; name: string }[] = [
     { path: "/", name: "Home" },
     { path: "/explore", name: "Explore" },
+    { path: "/explore/:source", name: "Explore" },
     { path: "/search", name: "Search" },
     { path: "/settings", name: "Settings" },
     { path: "/manga/:provider/:identifier", name: "Manga Details" },
@@ -34,8 +33,6 @@ function Header() {
   const currentTitle =
     routes.find((route) => matchPath(route.path, pathname))?.name ??
     "Page Not Found";
-  const { grid, setGrid } = useLayoutStore();
-  const gridOptions = ["8", "12", "16"];
 
   return (
     <header className="h-16 w-full p-2">
@@ -79,22 +76,12 @@ function Header() {
         </h1>
 
         <div className="flex items-center gap-4">
-          {pathname === "/explore" && (
-            <div>
-              <Select value={grid} onValueChange={setGrid}>
-                <SelectTrigger className="w-32">
-                  <SelectValue placeholder="Grid Layout" defaultValue={"8"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {gridOptions.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          {source && (
+            <Button onClick={() => refetch()} size="icon" variant="outline">
+              <RefreshCcw />
+            </Button>
           )}
+
           <ModeToggle />
         </div>
       </div>

@@ -6,7 +6,7 @@ import MangaDetail from "@/pages/mangaDetails";
 import Explore from "./pages/explore";
 import Search from "./pages/search";
 
-export const routes = createBrowserRouter([
+export const appRoutes = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
@@ -25,6 +25,10 @@ export const routes = createBrowserRouter([
       },
       {
         path: "explore",
+        element: <Explore />,
+      },
+      {
+        path: "explore/:source",
         element: <Explore />,
       },
       {

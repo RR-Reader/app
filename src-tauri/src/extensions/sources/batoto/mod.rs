@@ -1,4 +1,4 @@
 pub mod client;
-pub mod lists;
+pub mod page;
 pub mod manga;
 pub mod parser;

@@ -2,7 +2,7 @@ import "@/styles/globals.css";
 import { ThemeProvider } from "./components/theme-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "react-router";
-import { routes } from "./routes";
+import { appRoutes } from "./routes";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,7 +18,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider storageKey="vite-ui-theme" defaultTheme="system">
-        <RouterProvider router={routes} />
+        <RouterProvider router={appRoutes} />
       </ThemeProvider>
     </QueryClientProvider>
   );

@@ -44,7 +44,14 @@ export function Sidebar() {
     items: { name: string; path: string; icon?: LucideIcon }[];
   };
 
-  const sidebarPaths: SidebarPath[] = [
+  const isActive = (linkPath: string): boolean => {
+    if (linkPath === "/explore" && pathname.startsWith("/explore")) {
+      return true;
+    }
+    return pathname === linkPath;
+  };
+
+  const navigationLinks: SidebarPath[] = [
     {
       title: "Content",
       items: [
@@ -70,7 +77,7 @@ export function Sidebar() {
 
   const data = {
     title: "RReader",
-    main: sidebarPaths,
+    main: navigationLinks,
   };
 
   return (
@@ -88,8 +95,8 @@ export function Sidebar() {
                       <SidebarMenuButton
                         className={cn(
                           "mb-2 cursor-pointer",
-                          pathname !== link.path && "text-muted-foreground",
-                          pathname === link.path && "bg-accent/50",
+                          !isActive(link.path) && "text-muted-foreground",
+                          isActive(link.path) && "bg-accent/50",
                         )}
                       >
                         {link.icon && <link.icon />}

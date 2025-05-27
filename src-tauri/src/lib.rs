@@ -8,10 +8,9 @@ use moka::future::Cache;
 use std::sync::Arc;
 use tauri::{command, State};
 
-use crate::extensions::sources::batoto::{
-    lists::get_explore_page,
-    manga::get_manga_details,
-};
+use crate::extensions::sources::batoto::manga::get_manga_details;
+
+use crate::extensions::sources::pages::load_explore_pages;
 
 pub type EntryCache = Cache<String, Arc<MangaEntry>>;
 pub type MangaCache = Cache<String, Arc<Manga>>;
@@ -46,7 +45,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             clean_manga_cache,
             get_cache_stats,
-            get_explore_page,
+            load_explore_pages,
             get_manga_details
         ])
         .run(tauri::generate_context!())

@@ -38,7 +38,11 @@ export default function MangaDetail() {
     <>
       <div className="flex flex-col gap-2 sm:flex-row">
         <div className="aspect-[3/4] max-h-96">
-          <img src={data?.cover_url} alt="" className="rounded object-cover" />
+          <img
+            src={data?.cover_url}
+            alt=""
+            className="size-full rounded object-cover"
+          />
         </div>
         <div className="flex max-w-120 flex-col gap-1">
           <h1 className="text-3xl font-bold">{data?.title}</h1>

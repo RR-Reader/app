@@ -1,10 +1,9 @@
 import { MangaCard } from "@/components/mangaCard";
 import { cn } from "@/lib/utils";
 import { type GridValues, useLayoutStore } from "@/stores/layoutStore";
-import { invoke } from "@tauri-apps/api/core";
-import type { ExplorePage, ExploreSection } from "@/types";
-import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { getExplorePage } from "@/hooks/queries";
+import { useParams, Link } from "react-router";
 
 function ErrorFallback({
   error,
@@ -51,16 +50,36 @@ function LoadingSkeleton({ grid }: { grid: GridValues }) {
   );
 }
 
-const getExplorePage = () =>
-  useQuery({
-    queryKey: ["latest_releases"],
-    queryFn: () => invoke<ExplorePage>("get_explore_page"),
-  });
-
 export default function Explore() {
   const { grid } = useLayoutStore();
+  const { source } = useParams<{ source: string }>();
+  const { data, isLoading, error, refetch, isRefetching } =
+    getExplorePage(source);
 
-  const { data, isLoading, error, refetch, isRefetching } = getExplorePage();
+  const sourceList = [
+    { name: "Batoto", path: "/explore/batoto" },
+    { name: "Mangadex", path: "/explore/mangadex" },
+    { name: "WeebCentral", path: "/explore/weebcentral" },
+  ];
+
+  if (!source) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center">
+        <p className="mb-4 text-4xl font-semibold">No source selected</p>
+        <div className="flex gap-4">
+          {sourceList.map((src) => (
+            <Link key={src.name} to={src.path}>
+              <Button className="w-28 cursor-pointer">{src.name}</Button>
+            </Link>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  console.log("data", data);
+
+  const explorePage = data?.[0];
 
   return (
     <div className="h-full overflow-hidden">
@@ -77,7 +96,8 @@ export default function Explore() {
 
       {data &&
         !isLoading &&
-        data?.sections.map((section) => (
+        !isRefetching &&
+        explorePage?.sections.map((section) => (
           <div>
             <h1 className="mt-2 mb-4 text-3xl font-bold">{section.title}</h1>
             <div

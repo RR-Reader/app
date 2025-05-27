@@ -6,7 +6,7 @@ use crate::{
 use tauri::{command, State};
 
 #[command]
-pub async fn get_explore_page(cache: State<'_, EntryCache>) -> Result<ExplorePage, String> {
+pub async fn get_batoto_page(cache: State<'_, EntryCache>) -> Result<ExplorePage, String> {
     let client: BatotoClient = BatotoClient::new();
 
     let popular_section = ExploreSection {
