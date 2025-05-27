@@ -11,7 +11,8 @@ pub struct MangaEntry {
 pub struct Manga {
     pub identifier: String,
     pub title: String,
-    pub author: String,
+    pub artists: Vec<String>,
+    pub genres: Vec<String>,
     pub description: String,
     pub cover_url: String,
     pub chapters: Vec<ChapterEntry>,

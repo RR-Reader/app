@@ -1,7 +1,8 @@
 use crate::{
-    structs::MangaEntry,
+    structs::{ChapterEntry, Manga, MangaEntry},
     utils::{create_selectors, ScrapingError},
 };
+use regex::Regex;
 use scraper::{Html, Selector};
 use std::collections::HashMap;
 
@@ -215,4 +216,124 @@ pub fn extract_popular_entries(
     }
 
     Ok(entries)
+}
+
+pub fn extract_series_id(url: &str) -> Option<String> {
+    let re = Regex::new(r"/series/(\d+)").unwrap();
+    re.captures(url)
+        .and_then(|caps| caps.get(1).map(|m| m.as_str().to_string()))
+}
+
+pub fn extract_series_details(html_content: &str, url: &str) -> Result<Manga, ScrapingError> {
+    let document: Html = Html::parse_document(html_content);
+
+    let identifier: String = extract_series_id(url).expect("Failed to extract series ID from URL");
+
+    let selector_defs: [(&'static str, &'static str); 11] = [
+        ("title", "h3.item-title"),
+        ("image", "div.attr-cover > img"),
+        ("description", "div.limit-html"),
+        ("item", "div.attr-item"),
+        ("item-label", "div.attr-item > b"),
+        ("item-content", "div.attr-item > span"),
+        ("chapter-list", "div.main"),
+        ("chapter-item", "div.item"),
+        ("chapter-title", "a.chapt > b"),
+        ("chapter-url", "a.chapt"),
+        ("chapter-date", "i.ps-3"),
+    ];
+
+    let selector_map: HashMap<String, Selector> = create_selectors(&selector_defs)?;
+
+    let mut genres: Vec<String> = Vec::new();
+    let mut artists: Vec<String> = Vec::new();
+
+    let title: String = document
+        .select(&selector_map["title"])
+        .next()
+        .map(|t| t.text().collect::<String>().trim().to_string())
+        .unwrap_or_else(|| "Untitled".to_string());
+
+    let cover_url: String = document
+        .select(&selector_map["image"])
+        .next()
+        .and_then(|img| img.value().attr("src"))
+        .unwrap_or("")
+        .to_string();
+
+    let description: String = document
+        .select(&selector_map["description"])
+        .next()
+        .map(|t| t.text().collect::<String>().trim().to_string())
+        .unwrap_or_else(|| "Untitled".to_string());
+
+    for item in document.select(&selector_map["item"]) {
+        let label = item
+            .select(&selector_map["item-label"])
+            .next()
+            .map(|e| e.text().collect::<String>().trim().to_lowercase());
+
+        let content = item
+            .select(&selector_map["item-content"])
+            .next()
+            .map(|e| e.text().collect::<String>().trim().to_string());
+
+        match (label.as_deref(), content) {
+            (Some("artists"), Some(data)) => {
+                artists = data.split('/').map(|s| s.trim().to_string()).collect();
+            }
+            (Some("genres"), Some(data)) => {
+                genres = data.split(',').map(|s| s.trim().to_string()).collect();
+            }
+            _ => {}
+        }
+    }
+    
+    let mut chapters: Vec<ChapterEntry> = Vec::new();
+
+    if let Some(base) = document.select(&selector_map["chapter-list"]).next() {
+
+        for item in base.select(&selector_map["chapter-item"]) {
+            let title: String = item
+                .select(&selector_map["chapter-title"])
+                .next()
+                .map(|b| b.text().collect::<String>().trim().to_string())
+                .unwrap_or_else(|| "Untitled".to_string());
+
+            let url: String = item
+                .select(&selector_map["chapter-url"])
+                .next()
+                .and_then(|a| a.value().attr("href"))
+                .unwrap_or("")
+                .to_string();
+
+            let released_since = item
+                .select(&selector_map["chapter-date"])
+                .next()
+                .map(|s| s.text().collect::<String>().trim().to_string())
+                .unwrap_or_else(|| "Unknown".to_string());
+
+            chapters.push(ChapterEntry {
+                title,
+                url,
+                released_since,
+            });
+        }
+    } else {
+        return Err(ScrapingError::ParseError(
+            "Could not find chapter list".to_string(),
+        ));
+    }
+
+    let manga_base = Manga {
+        identifier,
+        title,
+        description,
+        artists,
+        genres,
+        cover_url,
+        chapters,
+    };
+
+    Ok(manga_base)
 }

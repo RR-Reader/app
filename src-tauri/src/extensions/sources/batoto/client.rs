@@ -129,7 +129,7 @@ impl BatotoClient {
 
     pub async fn get_manga_details(
         &self,
-        cache: State<'_, MangaCache>,
+        _cache: State<'_, MangaCache>,
         identifier: &str,
     ) -> Result<Arc<Manga>, String> {
         let arc_entry: Arc<Manga> = Arc::new(Manga {
@@ -138,11 +138,13 @@ impl BatotoClient {
             chapters: Vec::new(),
             description: String::new(),
             cover_url: String::new(),
-            author: String::new(),
+            artists: Vec::new(),
+            genres: Vec::new(),
         });
 
-        let url: String = format!("{}/series/{}/", self.base_url, identifier);
+        let _url: String = format!("{}/series/{}/", self.base_url, identifier);
 
         Ok(arc_entry)
     }
 }
+// https://battwo.com/series/189412/divorce-then-a-comeback-with-billions
