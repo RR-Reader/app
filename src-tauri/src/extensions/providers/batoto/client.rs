@@ -1,0 +1,129 @@
+use super::parser::{
+    extract_latest_entries, extract_latest_titles, extract_popular_entries, extract_popular_titles,
+};
+use crate::{
+    structs::MangaEntry,
+    utils::{get_cached_data, ScrapingError},
+    MangaCache,
+};
+use reqwest::Client;
+use std::sync::Arc;
+use tauri::State;
+
+pub struct BatotoClient {
+    base_url: String,
+    client: Client,
+}
+
+impl BatotoClient {
+    pub fn new() -> Self {
+        let client = Client::builder()
+            .timeout(std::time::Duration::from_secs(30))
+            .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .build()
+            .expect("Failed to build reqwest client");
+
+        Self {
+            client,
+            base_url: "https://battwo.com".to_string(),
+        }
+    }
+
+    pub async fn get_popular_manga(
+        &self,
+        cache: State<'_, MangaCache>,
+        limit: usize,
+    ) -> Result<Vec<Arc<MangaEntry>>, String> {
+        let html_content: String = self
+            .client
+            .get(&self.base_url)
+            .send()
+            .await
+            .map_err(|e| ScrapingError::NetworkError(format!("Request failed: {}", e)))?
+            .text()
+            .await
+            .map_err(|e| ScrapingError::NetworkError(format!("Failed to read response: {}", e)))?;
+
+        let titles: Vec<String> = extract_popular_titles(&html_content, limit)?;
+
+        if titles.is_empty() {
+            return Err("No manga titles found".to_string());
+        }
+
+        let (mut cached, missing) = get_cached_data(&titles, &cache).await;
+
+        if missing.is_empty() {
+            return Ok(cached);
+        }
+
+        let missing_entries: Vec<MangaEntry> =
+            extract_popular_entries(&html_content, &missing, limit)?;
+
+        for entry in missing_entries {
+            let arc_entry = Arc::new(entry);
+            cache
+                .insert(arc_entry.title.clone(), Arc::clone(&arc_entry))
+                .await;
+            cached.push(arc_entry);
+        }
+
+        let mut result: Vec<Arc<MangaEntry>> = Vec::with_capacity(titles.len());
+
+        for title in &titles {
+            if let Some(entry) = cached.iter().find(|e| &e.title == title) {
+                result.push(Arc::clone(entry));
+            }
+        }
+
+        Ok(result)
+    }
+
+    pub async fn get_latest_manga(
+        &self,
+        cache: State<'_, MangaCache>,
+        limit: usize,
+    ) -> Result<Vec<Arc<MangaEntry>>, String> {
+        let html_content: String = self
+            .client
+            .get(&self.base_url)
+            .send()
+            .await
+            .map_err(|e| ScrapingError::NetworkError(format!("Request failed: {}", e)))?
+            .text()
+            .await
+            .map_err(|e| ScrapingError::NetworkError(format!("Failed to read response: {}", e)))?;
+
+        let titles: Vec<String> = extract_latest_titles(&html_content, limit)?;
+
+        if titles.is_empty() {
+            return Err("No manga titles found".to_string());
+        }
+
+        let (mut cached, missing) = get_cached_data(&titles, &cache).await;
+
+        if missing.is_empty() {
+            return Ok(cached);
+        }
+
+        let missing_entries: Vec<MangaEntry> =
+            extract_latest_entries(&html_content, &missing, limit)?;
+
+        for entry in missing_entries {
+            let arc_entry = Arc::new(entry);
+            cache
+                .insert(arc_entry.title.clone(), Arc::clone(&arc_entry))
+                .await;
+            cached.push(arc_entry);
+        }
+
+        let mut result: Vec<Arc<MangaEntry>> = Vec::with_capacity(titles.len());
+
+        for title in &titles {
+            if let Some(entry) = cached.iter().find(|e| &e.title == title) {
+                result.push(Arc::clone(entry));
+            }
+        }
+
+        Ok(result)
+    }
+}

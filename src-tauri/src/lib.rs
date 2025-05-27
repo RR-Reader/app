@@ -1,30 +1,43 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+mod extensions;
+mod structs;
+mod utils;
+
+use crate::structs::MangaEntry;
+use moka::future::Cache;
+use std::sync::Arc;
+use tauri::{command, State};
+
+use crate::extensions::providers::batoto::lists::{get_latest_releases, get_popular_releases};
+
+pub type MangaCache = Cache<String, Arc<MangaEntry>>;
+
+#[command]
+async fn clean_manga_cache(cache: State<'_, MangaCache>) -> Result<(), String> {
+    cache.invalidate_all();
+    Ok(())
 }
 
-#[tauri::command]
-fn test_command() -> String {
-    format!("This is my test command.")
-}
-
-#[tauri::command]
-fn multiple_inputs_command(input1: &str, input2: &str, input3: &str) -> String {
-    format!(
-        "This is my test command with multiple inputs. 1: {}, 2: {}, 3: {}",
-        input1, input2, input3
-    )
+#[command]
+async fn get_cache_stats(cache: State<'_, MangaCache>) -> Result<(u64, u64), String> {
+    Ok((cache.entry_count(), cache.weighted_size()))
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let manga_cache: MangaCache = Cache::builder()
+        .max_capacity(1000)
+        .time_to_live(std::time::Duration::from_secs(3600))
+        .build();
+
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .manage(manga_cache)
         .invoke_handler(tauri::generate_handler![
-            greet,
-            test_command,
-            multiple_inputs_command
+            clean_manga_cache,
+            get_cache_stats,
+            get_popular_releases,
+            get_latest_releases
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

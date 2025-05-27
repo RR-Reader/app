@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MangaEntry {
     pub title: String,
-    pub cover_url: Option<String>,
+    pub cover_url: String,
     pub url: String,
 }
 
@@ -13,7 +13,7 @@ pub struct Manga {
     pub author: String,
     pub description: String,
     pub cover_url: String,
-    pub chapters: Vec<Chapter>,
+    pub chapters: Vec<ChapterEntry>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
