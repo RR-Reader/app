@@ -1,9 +1,7 @@
-use std::sync::Arc;
-
-use crate::{structs::Manga, MangaCache};
-use tauri::{command, State};
-
 use super::client::BatotoClient;
+use crate::{structs::Manga, MangaCache};
+use std::sync::Arc;
+use tauri::{command, State};
 
 #[command]
 pub async fn get_manga_details(
@@ -11,7 +9,7 @@ pub async fn get_manga_details(
     identifier: String,
 ) -> Result<Arc<Manga>, String> {
     let client: BatotoClient = BatotoClient::new();
-    let manga_details: Arc<Manga> = client.get_manga_details(cache, &identifier).await?;
+    let res: Arc<Manga> = client.get_manga_details(cache, &identifier).await?;
 
-    Ok(manga_details)
+    Ok(res)
 }

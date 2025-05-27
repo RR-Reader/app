@@ -3,7 +3,7 @@ mod extensions;
 mod structs;
 mod utils;
 
-use crate::structs::MangaEntry;
+use crate::structs::{Manga, MangaEntry};
 use moka::future::Cache;
 use std::sync::Arc;
 use tauri::{command, State};
@@ -13,22 +13,23 @@ use crate::extensions::sources::batoto::{
     manga::get_manga_details,
 };
 
-pub type MangaCache = Cache<String, Arc<MangaEntry>>;
+pub type EntryCache = Cache<String, Arc<MangaEntry>>;
+pub type MangaCache = Cache<String, Arc<Manga>>;
 
 #[command]
-async fn clean_manga_cache(cache: State<'_, MangaCache>) -> Result<(), String> {
+async fn clean_manga_cache(cache: State<'_, EntryCache>) -> Result<(), String> {
     cache.invalidate_all();
     Ok(())
 }
 
 #[command]
-async fn get_cache_stats(cache: State<'_, MangaCache>) -> Result<(u64, u64), String> {
+async fn get_cache_stats(cache: State<'_, EntryCache>) -> Result<(u64, u64), String> {
     Ok((cache.entry_count(), cache.weighted_size()))
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let manga_cache: MangaCache = Cache::builder()
+    let manga_cache: EntryCache = Cache::builder()
         .max_capacity(1000)
         .time_to_live(std::time::Duration::from_secs(3600))
         .build();

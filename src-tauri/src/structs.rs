@@ -2,9 +2,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MangaEntry {
+    pub identifier: String,
     pub title: String,
     pub cover_url: String,
-    pub url: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -12,6 +12,7 @@ pub struct Manga {
     pub identifier: String,
     pub title: String,
     pub artists: Vec<String>,
+    pub authors: Vec<String>,
     pub genres: Vec<String>,
     pub description: String,
     pub cover_url: String,

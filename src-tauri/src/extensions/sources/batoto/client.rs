@@ -1,10 +1,11 @@
 use super::parser::{
     extract_latest_entries, extract_latest_titles, extract_popular_entries, extract_popular_titles,
+    extract_series_details, extract_id_from_url,
 };
 use crate::{
     structs::{Manga, MangaEntry},
     utils::{get_cached_data, ScrapingError},
-    MangaCache,
+    {EntryCache, MangaCache},
 };
 use reqwest::Client;
 use std::sync::Arc;
@@ -31,7 +32,7 @@ impl BatotoClient {
 
     pub async fn get_popular_manga(
         &self,
-        cache: State<'_, MangaCache>,
+        cache: State<'_, EntryCache>,
         limit: usize,
     ) -> Result<Vec<Arc<MangaEntry>>, String> {
         let html_content: String = self
@@ -80,7 +81,7 @@ impl BatotoClient {
 
     pub async fn get_latest_manga(
         &self,
-        cache: State<'_, MangaCache>,
+        cache: State<'_, EntryCache>,
         limit: usize,
     ) -> Result<Vec<Arc<MangaEntry>>, String> {
         let html_content: String = self
@@ -129,20 +130,30 @@ impl BatotoClient {
 
     pub async fn get_manga_details(
         &self,
-        _cache: State<'_, MangaCache>,
-        identifier: &str,
+        cache: State<'_, MangaCache>,
+        url: &str,
     ) -> Result<Arc<Manga>, String> {
-        let arc_entry: Arc<Manga> = Arc::new(Manga {
-            identifier: identifier.to_string(),
-            title: identifier.to_string(),
-            chapters: Vec::new(),
-            description: String::new(),
-            cover_url: String::new(),
-            artists: Vec::new(),
-            genres: Vec::new(),
-        });
+        let identifier = extract_id_from_url(url)
+            .ok_or_else(|| "Failed to extract series ID from URL".to_string())?;
 
-        let _url: String = format!("{}/series/{}/", self.base_url, identifier);
+        if let Some(cached) = cache.get(&identifier).await {
+            return Ok(cached);
+        }
+
+        let html_content: String = self
+            .client
+            .get(url)
+            .send()
+            .await
+            .map_err(|e| ScrapingError::NetworkError(format!("Request failed: {}", e)))?
+            .text()
+            .await
+            .map_err(|e| ScrapingError::NetworkError(format!("Failed to read response: {}", e)))?;
+
+        let entry: Manga = extract_series_details(&html_content, &url)?;
+        let arc_entry: Arc<Manga> = Arc::new(entry);
+
+        cache.insert(identifier, Arc::clone(&arc_entry)).await;
 
         Ok(arc_entry)
     }
