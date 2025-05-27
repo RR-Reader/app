@@ -1,2 +1,2 @@
-pub mod providers;
+pub mod sources;
 pub mod integrations;

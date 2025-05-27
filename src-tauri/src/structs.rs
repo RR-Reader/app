@@ -9,6 +9,7 @@ pub struct MangaEntry {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Manga {
+    pub identifier: String,
     pub title: String,
     pub author: String,
     pub description: String,

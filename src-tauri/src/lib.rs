@@ -8,7 +8,10 @@ use moka::future::Cache;
 use std::sync::Arc;
 use tauri::{command, State};
 
-use crate::extensions::providers::batoto::lists::{get_latest_releases, get_popular_releases};
+use crate::extensions::sources::batoto::{
+    lists::{get_latest_releases, get_popular_releases},
+    manga::get_manga_details,
+};
 
 pub type MangaCache = Cache<String, Arc<MangaEntry>>;
 
@@ -37,7 +40,8 @@ pub fn run() {
             clean_manga_cache,
             get_cache_stats,
             get_popular_releases,
-            get_latest_releases
+            get_latest_releases,
+            get_manga_details
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

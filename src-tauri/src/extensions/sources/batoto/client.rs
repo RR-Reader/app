@@ -2,7 +2,7 @@ use super::parser::{
     extract_latest_entries, extract_latest_titles, extract_popular_entries, extract_popular_titles,
 };
 use crate::{
-    structs::MangaEntry,
+    structs::{Manga, MangaEntry},
     utils::{get_cached_data, ScrapingError},
     MangaCache,
 };
@@ -125,5 +125,24 @@ impl BatotoClient {
         }
 
         Ok(result)
+    }
+
+    pub async fn get_manga_details(
+        &self,
+        cache: State<'_, MangaCache>,
+        identifier: &str,
+    ) -> Result<Arc<Manga>, String> {
+        let arc_entry: Arc<Manga> = Arc::new(Manga {
+            identifier: identifier.to_string(),
+            title: identifier.to_string(),
+            chapters: Vec::new(),
+            description: String::new(),
+            cover_url: String::new(),
+            author: String::new(),
+        });
+
+        let url: String = format!("{}/series/{}/", self.base_url, identifier);
+
+        Ok(arc_entry)
     }
 }
