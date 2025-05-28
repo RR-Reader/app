@@ -20,7 +20,7 @@ export const appRoutes = createBrowserRouter([
         element: <Settings />,
       },
       {
-        path: "manga/:provider/:identifier",
+        path: "manga/:source/:identifier",
         element: <MangaDetail />,
       },
       {

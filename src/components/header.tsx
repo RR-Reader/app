@@ -9,7 +9,7 @@ import {
   ChevronRight,
   RefreshCcw,
 } from "lucide-react";
-import { getExplorePage } from "@/hooks/queries";
+import { useGetExplorePage } from "@/hooks/queries";
 import { useParams } from "react-router";
 
 function Header() {
@@ -19,7 +19,7 @@ function Header() {
 
   const { source } = useParams<{ source: string }>();
 
-  const { refetch } = getExplorePage(source || undefined);
+  const { refetch } = useGetExplorePage(source || undefined);
 
   const routes: { path: string; name: string }[] = [
     { path: "/", name: "Home" },

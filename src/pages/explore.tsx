@@ -2,7 +2,7 @@ import { MangaCard } from "@/components/mangaCard";
 import { cn } from "@/lib/utils";
 import { type GridValues, useLayoutStore } from "@/stores/layoutStore";
 import { Button } from "@/components/ui/button";
-import { getExplorePage } from "@/hooks/queries";
+import { useGetExplorePage } from "@/hooks/queries";
 import { useParams, Link } from "react-router";
 
 function ErrorFallback({
@@ -54,7 +54,7 @@ export default function Explore() {
   const { grid } = useLayoutStore();
   const { source } = useParams<{ source: string }>();
   const { data, isLoading, error, refetch, isRefetching } =
-    getExplorePage(source);
+    useGetExplorePage(source);
 
   const sourceList = [
     { name: "Batoto", path: "/explore/batoto" },
