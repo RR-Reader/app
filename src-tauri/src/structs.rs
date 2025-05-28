@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use serde::{Deserialize, Serialize};
 
@@ -46,3 +46,10 @@ pub struct ExplorePage {
     pub source: String,
     pub sections: Vec<ExploreSection>,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Library {
+    pub categories: HashMap<String, Vec<Arc<MangaEntry>>>,
+}
+
+

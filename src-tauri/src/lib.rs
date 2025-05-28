@@ -1,5 +1,7 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 mod extensions;
+mod library;
+mod preferences;
 mod structs;
 mod utils;
 
@@ -8,9 +10,7 @@ use moka::future::Cache;
 use std::sync::Arc;
 use tauri::{command, State};
 
-use crate::extensions::sources::batoto::manga::get_manga_details;
-
-use crate::extensions::sources::pages::load_explore_pages;
+use crate::extensions::sources::handler::{load_explore_pages, load_source_chapter};
 
 pub type EntryCache = Cache<String, Arc<MangaEntry>>;
 pub type MangaCache = Cache<String, Arc<Manga>>;
@@ -46,7 +46,7 @@ pub fn run() {
             clean_manga_cache,
             get_cache_stats,
             load_explore_pages,
-            get_manga_details
+            load_source_chapter
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

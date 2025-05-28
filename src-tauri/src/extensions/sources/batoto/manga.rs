@@ -1,10 +1,9 @@
 use super::client::BatotoClient;
 use crate::{structs::Manga, MangaCache};
 use std::sync::Arc;
-use tauri::{command, State};
+use tauri::State;
 
-#[command]
-pub async fn get_manga_details(
+pub async fn get_batoto_manga(
     cache: State<'_, MangaCache>,
     identifier: String,
 ) -> Result<Arc<Manga>, String> {
