@@ -128,9 +128,9 @@ export function CategoryCard({
   onEdit,
 }: CategoryCardProps) {
   return (
-    <Card className="hover:bg-card/40 flex max-h-40 flex-col justify-between px-4 py-2 shadow-md transition-all">
+    <Card className="hover:bg-card/40 flex max-h-40 flex-col justify-between px-4 py-2 shadow-md transition-all md:aspect-square md:h-40">
       <Link to={`/category/${slug}`} className="cursor-pointer">
-        <div className="mb-2 text-lg font-semibold">{title}</div>
+        <h1 className="mb-2 truncate text-lg font-semibold">{title}</h1>
         <div className="text-muted-foreground mb-4 text-sm">
           {entryCount} Entries
         </div>

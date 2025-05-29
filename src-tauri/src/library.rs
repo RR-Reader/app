@@ -114,7 +114,7 @@ impl Library {
 
     pub fn find_category_for_manga(&self, manga_entry: &MangaEntry) -> Result<String, String> {
         for category in &self.categories {
-            // Check if the manga entry exists in this category's entries
+      
             if category
                 .entries
                 .iter()

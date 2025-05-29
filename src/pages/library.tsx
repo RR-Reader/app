@@ -70,7 +70,7 @@ export default function Library() {
       <Dialog>
         <DialogTrigger asChild>
           <Button asChild variant="outline">
-            <Card className="group hover:bg-sidebar flex h-full max-h-40 cursor-pointer items-center justify-center border-dashed px-4 py-2 shadow-md transition-all">
+            <Card className="group hover:bg-sidebar flex h-full cursor-pointer items-center justify-center border-dashed px-4 py-2 shadow-md transition-all sm:aspect-square sm:max-h-40">
               <Plus className="text-muted-foreground group-hover:text-primary size-8 transition-colors" />
             </Card>
           </Button>
