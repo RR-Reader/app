@@ -1,8 +1,8 @@
-import { MangaCard } from "@/components/mangaCard";
+import { MangaCard, ViewMoreCard } from "@/components/manga-card";
 import { cn } from "@/lib/utils";
 import { type GridValues, useLayoutStore } from "@/stores/layoutStore";
 import { Button } from "@/components/ui/button";
-import { useGetExplorePage } from "@/hooks/queries";
+import { QUERIES } from "@/hooks/queries";
 import { useParams, Link } from "react-router";
 
 function ErrorFallback({
@@ -31,7 +31,7 @@ function LoadingSkeleton({ grid }: { grid: GridValues }) {
   return (
     <div
       className={cn(
-        "grid gap-4",
+        "grid gap-4 p-4",
         skeletonCount === 6 && "grid-cols-6",
         skeletonCount === 8 && "grid-cols-8",
         skeletonCount === 10 && "grid-cols-10",
@@ -54,7 +54,7 @@ export default function Explore() {
   const { grid } = useLayoutStore();
   const { source } = useParams<{ source: string }>();
   const { data, isLoading, error, refetch, isRefetching } =
-    useGetExplorePage(source);
+    QUERIES.useFetchExplorePages(source);
 
   const sourceList = [
     { name: "Batoto", path: "/explore/batoto" },
@@ -99,10 +99,12 @@ export default function Explore() {
         !isRefetching &&
         explorePage?.sections.map((section) => (
           <div>
-            <h1 className="mt-2 mb-4 text-3xl font-bold">{section.title}</h1>
+            <h1 className="mt-2 mb-4 ml-2 text-3xl font-bold">
+              {section.title}
+            </h1>
             <div
               className={cn(
-                "grid gap-4",
+                "grid gap-4 p-4",
                 grid === "8" && "grid-cols-8",
                 grid === "12" && "grid-cols-12",
                 grid === "16" && "grid-cols-16",
@@ -116,6 +118,8 @@ export default function Explore() {
                   coverUrl={entry.cover_url}
                 />
               ))}
+
+              <ViewMoreCard source={source} />
             </div>
           </div>
         ))}

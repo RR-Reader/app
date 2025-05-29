@@ -11,12 +11,12 @@ pub async fn get_batoto_page(cache: State<'_, EntryCache>) -> Result<ExplorePage
 
     let popular_section = ExploreSection {
         title: "Popular Releases".to_string(),
-        entries: client.get_popular_manga(&cache, 16).await?,
+        entries: client.get_popular_manga(&cache, 11).await?,
     };
 
     let latest_section = ExploreSection {
         title: "Latest Releases".to_string(),
-        entries: client.get_latest_manga(&cache, 36).await?,
+        entries: client.get_latest_manga(&cache, 23).await?,
     };
 
     Ok(ExplorePage {

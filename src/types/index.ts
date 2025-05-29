@@ -1,11 +1,11 @@
-type MangaEntry = {
+interface MangaEntry {
   source: string;
   identifier: string;
   title: string;
   cover_url?: string;
-};
+}
 
-type Manga = {
+interface Manga {
   identifier: string;
   title: string;
   artists: string[];
@@ -14,28 +14,40 @@ type Manga = {
   description: string;
   cover_url: string;
   chapters: ChapterEntry[];
-};
+}
 
-type ChapterEntry = {
+interface ChapterEntry {
   title: string;
   url: string;
   released_since: string;
-};
+}
 
-type Chapter = {
+interface Chapter {
   url: string;
   pages: string[];
-};
+}
 
-type ExploreSection = {
+interface ExploreSection {
   title: string;
   entries: MangaEntry[];
-};
+}
 
-type ExplorePage = {
+interface ExplorePage {
   source: string;
   sections: ExploreSection[];
-};
+}
+
+interface Library {
+  categories: Category[];
+}
+
+interface Category {
+  title: string;
+  slug: string;
+  entries: MangaEntry[];
+  sort_by: string;
+  sort_order: "asc" | "desc";
+}
 
 export type {
   MangaEntry,
@@ -44,4 +56,6 @@ export type {
   Chapter,
   ExplorePage,
   ExploreSection,
+  Library,
+  Category,
 };

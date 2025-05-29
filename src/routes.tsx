@@ -1,10 +1,19 @@
 import { createBrowserRouter } from "react-router";
+
+import Category from "./pages/category";
 import Layout from "./components/layout";
-import Home from "@/pages/home";
+import Library from "@/pages/library";
 import Settings from "@/pages/settings";
 import MangaDetail from "@/pages/mangaDetails";
 import Explore from "./pages/explore";
 import Search from "./pages/search";
+
+import Experimental from "./pages/settings/experimental";
+import ReaderPreferences from "./pages/settings/reader-preferences";
+import StorageCaching from "./pages/settings/storage-caching";
+import SystemBehavior from "./pages/settings/system-behavior";
+import LayoutAppearance from "./pages/settings/layout-appearance";
+import LibraryHistory from "./pages/settings/library-history";
 
 export const appRoutes = createBrowserRouter([
   {
@@ -13,11 +22,7 @@ export const appRoutes = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Home />,
-      },
-      {
-        path: "settings",
-        element: <Settings />,
+        element: <Library />,
       },
       {
         path: "manga/:source/:identifier",
@@ -34,6 +39,44 @@ export const appRoutes = createBrowserRouter([
       {
         path: "search",
         element: <Search />,
+      },
+      {
+        path: "category/:title",
+        element: <Category />,
+      },
+      {
+        path: "settings",
+        element: <Settings />,
+        children: [
+          {
+            index: true,
+            element: <LayoutAppearance />, // Default to first section
+          },
+          {
+            path: "layout-appearance",
+            element: <LayoutAppearance />,
+          },
+          {
+            path: "reader-preferences",
+            element: <ReaderPreferences />,
+          },
+          {
+            path: "library-history",
+            element: <LibraryHistory />,
+          },
+          {
+            path: "storage-caching",
+            element: <StorageCaching />,
+          },
+          {
+            path: "system-behavior",
+            element: <SystemBehavior />,
+          },
+          {
+            path: "experimental",
+            element: <Experimental />,
+          },
+        ],
       },
     ],
   },

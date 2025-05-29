@@ -1,7 +1,7 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 mod extensions;
 mod library;
-mod preferences;
+mod settings;
 mod structs;
 mod utils;
 
@@ -11,6 +11,10 @@ use std::sync::Arc;
 use tauri::{command, State};
 
 use crate::extensions::sources::handler::{load_explore_pages, load_source_chapter};
+
+use crate::library::{
+    create_category, find_category_for_manga, get_category_by_slug, load_library, save_manga,
+};
 
 pub type EntryCache = Cache<String, Arc<MangaEntry>>;
 pub type MangaCache = Cache<String, Arc<Manga>>;
@@ -46,7 +50,16 @@ pub fn run() {
             clean_manga_cache,
             get_cache_stats,
             load_explore_pages,
-            load_source_chapter
+            load_source_chapter,
+            load_library,
+            create_category,
+            save_manga,
+            get_category_by_slug,
+            find_category_for_manga,
+            settings::load_settings,
+            settings::update_setting,
+            settings::reset_settings,
+            settings::get_setting_section,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
