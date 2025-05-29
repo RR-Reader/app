@@ -1,8 +1,9 @@
 import { useParams } from "react-router";
-import { QUERIES, MUTATIONS } from "@/hooks/queries";
+import MANGA_HOOKS from "@/hooks/use-manga";
+import LIBRARY_HOOKS from "@/hooks/library";
 import { Button } from "@/components/ui/button";
 import { Heart, BookOpen, Star } from "lucide-react";
-import { useCoverStyle } from "@/hooks/settings/useCoverStyle";
+import { useCoverStyle } from "@/hooks/settings/use-cover-style";
 import { coverVariants } from "@/lib/cover-variants";
 import { cn } from "@/lib/utils";
 import {
@@ -33,7 +34,8 @@ interface MangaAddProps {
 }
 
 function AddMangaDialog({ manga, onAdd }: MangaAddProps) {
-  const { data: library, isLoading: libraryLoading } = QUERIES.useLoadLibrary();
+  const { data: library, isLoading: libraryLoading } =
+    LIBRARY_HOOKS.useLoadLibrary();
   const categories: Category[] = library?.categories || [];
   const [selectedCategory, setSelectedCategory] = useState<string>("");
 
@@ -125,11 +127,11 @@ export default function MangaDetail() {
   }>();
   const { coverStyle } = useCoverStyle();
 
-  const { data, isLoading, error } = QUERIES.useQueryMangaInfo(
+  const { data, isLoading, error } = MANGA_HOOKS.useQueryMangaInfo(
     identifier,
     source,
   );
-  const { mutate } = MUTATIONS.useAddMangaToCategory();
+  const { mutate } = LIBRARY_HOOKS.useAddMangaToCategory();
 
   if (isLoading) {
     return (

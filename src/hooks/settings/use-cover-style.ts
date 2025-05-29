@@ -1,4 +1,4 @@
-import { useSettings } from "@/hooks/settings/useSettings";
+import { useSettings } from "@/hooks/settings/use-settings";
 
 type CoverStyle = "rounded" | "square" | "border" | "shadow";
 

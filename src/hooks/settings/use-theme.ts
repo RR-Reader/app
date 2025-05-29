@@ -1,4 +1,4 @@
-import { useSettings } from "@/hooks/settings/useSettings";
+import { useSettings } from "@/hooks/settings/use-settings";
 import { useEffect } from "react";
 
 type Theme = "dark" | "light" | "system";

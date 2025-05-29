@@ -1,4 +1,4 @@
-import { useSettings } from "@/hooks/settings/useSettings";
+import { useSettings } from "@/hooks/settings/use-settings";
 
 export function useShowTitles() {
   const { settings, updateSetting } = useSettings();

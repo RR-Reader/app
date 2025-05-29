@@ -12,15 +12,15 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QUERIES, MUTATIONS } from "@/hooks/queries";
+import LIBRARY_HOOKS from "@/hooks/library";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 
 export default function Library() {
-  const { data, isLoading, isError } = QUERIES.useLoadLibrary();
-  const { mutate: createCategory } = MUTATIONS.useCreateCategory();
+  const { data, isLoading, isError } = LIBRARY_HOOKS.useLoadLibrary();
+  const { mutate: createCategory } = LIBRARY_HOOKS.useCreateCategory();
 
   const [value, setValue] = useState("");
 

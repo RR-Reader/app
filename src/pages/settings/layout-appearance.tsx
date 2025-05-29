@@ -1,9 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { SettingItem } from "@/components/settings/settings-item";
 import { SettingRenderer } from "@/components/settings/settings-renderer";
-import { useSettings } from "@/hooks/settings/useSettings";
+import { useSettings } from "@/hooks/settings/use-settings";
 import { Paintbrush } from "lucide-react";
-import { useTheme } from "@/hooks/settings/useTheme";
+import { useTheme } from "@/hooks/settings/use-theme";
 import { useLayoutStore } from "@/stores/layoutStore";
 
 export default function LayoutAppearance() {

@@ -79,6 +79,10 @@ impl Library {
         category_name: &str,
         manga_entry: Arc<MangaEntry>,
     ) -> Result<(), String> {
+        if self.manga_exists(&manga_entry) {
+            return Err("Manga already exists in library".to_string());
+        }
+
         if let Some(category) = self
             .categories
             .iter_mut()
@@ -89,7 +93,6 @@ impl Library {
             return Err(format!("Category '{}' does not exist", category_name));
         }
 
-        // Always add to "All Titles"
         if let Some(all_category) = self
             .categories
             .iter_mut()
@@ -104,22 +107,27 @@ impl Library {
         self.save()
     }
 
+    fn manga_exists(&self, manga_entry: &MangaEntry) -> bool {
+        self.categories.iter().any(|cat| {
+            cat.entries.iter().any(|entry| {
+                entry.identifier == manga_entry.identifier && entry.source == manga_entry.source
+            })
+        })
+    }
+
     pub fn load_category_by_slug(&self, slug: &str) -> Result<Category, String> {
-    self.categories
-        .iter()
-        .find(|cat| cat.slug == slug)
-        .cloned()
-        .ok_or_else(|| format!("Category with slug '{}' not found", slug))
-}
+        self.categories
+            .iter()
+            .find(|cat| cat.slug == slug)
+            .cloned()
+            .ok_or_else(|| format!("Category with slug '{}' not found", slug))
+    }
 
     pub fn find_category_for_manga(&self, manga_entry: &MangaEntry) -> Result<String, String> {
         for category in &self.categories {
-      
-            if category
-                .entries
-                .iter()
-                .any(|entry| Arc::ptr_eq(entry, &Arc::new(manga_entry.clone())))
-            {
+            if category.entries.iter().any(|entry| {
+                entry.identifier == manga_entry.identifier && entry.source == manga_entry.source
+            }) {
                 return Ok(category.title.clone());
             }
         }

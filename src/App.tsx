@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "react-router";
 import { appRoutes } from "./routes";
 import { useEffect } from "react";
+import { ThemeProvider } from "@/hooks/theme-provider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,7 +29,9 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={appRoutes} />
+      <ThemeProvider>
+        <RouterProvider router={appRoutes} />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

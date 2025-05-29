@@ -12,10 +12,6 @@ use tauri::{command, State};
 
 use crate::extensions::sources::handler::{load_explore_pages, load_source_chapter};
 
-use crate::library::{
-    create_category, find_category_for_manga, get_category_by_slug, load_library, save_manga,
-};
-
 pub type EntryCache = Cache<String, Arc<MangaEntry>>;
 pub type MangaCache = Cache<String, Arc<Manga>>;
 
@@ -51,11 +47,11 @@ pub fn run() {
             get_cache_stats,
             load_explore_pages,
             load_source_chapter,
-            load_library,
-            create_category,
-            save_manga,
-            get_category_by_slug,
-            find_category_for_manga,
+            library::load_library,
+            library::create_category,
+            library::save_manga,
+            library::get_category_by_slug,
+            library::find_category_for_manga,
             settings::load_settings,
             settings::update_setting,
             settings::reset_settings,

@@ -1,7 +1,7 @@
 import { Search } from "lucide-react";
 import { Link } from "react-router";
-import { useCoverStyle } from "@/hooks/settings/useCoverStyle";
-import { useShowTitles } from "@/hooks/settings/useShowTitles";
+import { useCoverStyle } from "@/hooks/settings/use-cover-style";
+import { useShowTitles } from "@/hooks/settings/use-show-titles";
 import { coverVariants, viewMoreVariants } from "@/lib/cover-variants";
 import { cn } from "@/lib/utils";
 

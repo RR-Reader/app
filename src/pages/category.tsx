@@ -1,6 +1,6 @@
 import { MangaCard } from "@/components/manga-card";
 import { Button } from "@/components/ui/button";
-import { QUERIES } from "@/hooks/queries";
+import LIBRARY_HOOKS from "@/hooks/library";
 import { cn } from "@/lib/utils";
 import { GridValues, useLayoutStore } from "@/stores/layoutStore";
 import { useParams } from "react-router";
@@ -54,7 +54,7 @@ export default function Category() {
   const { grid } = useLayoutStore();
   const { title } = useParams<{ title: string }>();
   const { data, isLoading, error, refetch, isRefetching } =
-    QUERIES.useFetchCategory(title);
+    LIBRARY_HOOKS.useFetchCategory(title);
 
   return (
     <>
