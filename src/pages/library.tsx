@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import LIBRARY_HOOKS from "@/hooks/library";
+import LIBRARY_HOOKS from "@/hooks/use-library";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -48,7 +48,7 @@ export default function Library() {
   }
 
   function handleDelete() {}
-  function handleEdit(test: string) {}
+  function handleEdit(_test: string) {}
 
   return (
     <div

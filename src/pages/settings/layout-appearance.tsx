@@ -3,13 +3,11 @@ import { SettingItem } from "@/components/settings/settings-item";
 import { SettingRenderer } from "@/components/settings/settings-renderer";
 import { useSettings } from "@/hooks/settings/use-settings";
 import { Paintbrush } from "lucide-react";
-import { useTheme } from "@/hooks/settings/use-theme";
-import { useLayoutStore } from "@/stores/layoutStore";
+import { useTheme } from "@/hooks/use-theme";
 
 export default function LayoutAppearance() {
   const { settings, updateSetting } = useSettings();
   const { setTheme, theme } = useTheme();
-  const { setGrid } = useLayoutStore();
 
   if (!settings) return <div>Loading...</div>;
 
@@ -52,12 +50,12 @@ export default function LayoutAppearance() {
               }}
               value={settings.layout_appearance.grid_size}
               onChange={(value) => {
+                const num = Number(value);
                 updateSetting({
                   section: "layout_appearance",
                   key: "grid_size",
-                  value,
+                  value: num,
                 });
-                setGrid(value);
               }}
             />
           </SettingItem>

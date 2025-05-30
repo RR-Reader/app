@@ -4,6 +4,7 @@ import { RouterProvider } from "react-router";
 import { appRoutes } from "./routes";
 import { useEffect } from "react";
 import { ThemeProvider } from "@/hooks/theme-provider";
+import { Toaster } from "sonner";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,6 +32,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <RouterProvider router={appRoutes} />
+        <Toaster />
       </ThemeProvider>
     </QueryClientProvider>
   );

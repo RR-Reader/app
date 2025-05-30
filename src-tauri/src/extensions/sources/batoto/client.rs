@@ -44,13 +44,13 @@ impl BatotoClient {
     async fn get_entries<TitleExtractor, EntryExtractor>(
         &self,
         cache: &State<'_, EntryCache>,
-        limit: usize,
+        limit: &usize,
         extract_titles: TitleExtractor,
         extract_entries: EntryExtractor,
     ) -> Result<Vec<Arc<MangaEntry>>, ScrapingError>
     where
-        TitleExtractor: Fn(&str, usize) -> Result<Vec<String>, ScrapingError>,
-        EntryExtractor: Fn(&str, &[String], usize) -> Result<Vec<MangaEntry>, ScrapingError>,
+        TitleExtractor: Fn(&str, &usize) -> Result<Vec<String>, ScrapingError>,
+        EntryExtractor: Fn(&str, &[String], &usize) -> Result<Vec<MangaEntry>, ScrapingError>,
     {
         let html_content = self
             .fetch_homepage()
@@ -113,13 +113,15 @@ impl BatotoClient {
     pub async fn get_popular_manga(
         &self,
         cache: &State<'_, EntryCache>,
-        limit: usize,
+        limit: &usize,
     ) -> Result<Vec<Arc<MangaEntry>>, ScrapingError> {
         self.get_entries(
             cache,
             limit,
-            extract_popular_titles,
-            extract_popular_entries,
+            |html_content, limit| extract_popular_titles(html_content, limit),
+            |html_content, missing_titles, limit| {
+                extract_popular_entries(html_content, missing_titles, limit)
+            },
         )
         .await
     }
@@ -127,10 +129,17 @@ impl BatotoClient {
     pub async fn get_latest_manga(
         &self,
         cache: &State<'_, EntryCache>,
-        limit: usize,
+        limit: &usize,
     ) -> Result<Vec<Arc<MangaEntry>>, ScrapingError> {
-        self.get_entries(cache, limit, extract_latest_titles, extract_latest_entries)
-            .await // Convert ScrapingError to String
+        self.get_entries(
+            cache,
+            limit,
+            |html_content, limit| extract_latest_titles(html_content, limit),
+            |html_content, missing_titles, limit| {
+                extract_latest_entries(html_content, missing_titles, limit)
+            },
+        )
+        .await
     }
 
     pub async fn get_manga_details(

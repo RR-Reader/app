@@ -1,9 +1,9 @@
 import { MangaCard, ViewMoreCard } from "@/components/manga-card";
 import { cn } from "@/lib/utils";
-import { type GridValues, useLayoutStore } from "@/stores/layoutStore";
 import { Button } from "@/components/ui/button";
-import EXPLORE from "@/hooks/explore";
+import EXPLORE from "@/hooks/use-explore";
 import { useParams, Link } from "react-router";
+import { useGrid } from "@/hooks/settings/use-grid";
 
 function ErrorFallback({
   error,
@@ -25,21 +25,19 @@ function ErrorFallback({
   );
 }
 
-function LoadingSkeleton({ grid }: { grid: GridValues }) {
-  const skeletonCount = Number.parseInt(grid) || 6;
-
+function LoadingSkeleton({ grid }: { grid: number }) {
   return (
     <div
       className={cn(
         "grid gap-4 p-4",
-        skeletonCount === 6 && "grid-cols-6",
-        skeletonCount === 8 && "grid-cols-8",
-        skeletonCount === 10 && "grid-cols-10",
-        skeletonCount === 12 && "grid-cols-12",
-        skeletonCount === 16 && "grid-cols-16",
+        grid === 6 && "grid-cols-6",
+        grid === 8 && "grid-cols-8",
+        grid === 10 && "grid-cols-10",
+        grid === 12 && "grid-cols-12",
+        grid === 16 && "grid-cols-16",
       )}
     >
-      {Array.from({ length: skeletonCount }).map((_, index) => (
+      {Array.from({ length: grid }).map((_, index) => (
         <div key={index} className="animate-pulse">
           <div className="mb-2 aspect-[3/4] rounded-lg bg-gray-200"></div>
           <div className="mb-1 h-4 rounded bg-gray-200"></div>
@@ -51,7 +49,7 @@ function LoadingSkeleton({ grid }: { grid: GridValues }) {
 }
 
 export default function Explore() {
-  const { grid } = useLayoutStore();
+  const { grid } = useGrid();
   const { source } = useParams<{ source: string }>();
   const { data, isLoading, error, refetch, isRefetching } =
     EXPLORE.useFetchExplorePages(source);
@@ -105,9 +103,10 @@ export default function Explore() {
             <div
               className={cn(
                 "grid gap-4 p-4",
-                grid === "8" && "grid-cols-8",
-                grid === "12" && "grid-cols-12",
-                grid === "16" && "grid-cols-16",
+                grid === 6 && "grid-cols-6",
+                grid === 8 && "grid-cols-8",
+                grid === 12 && "grid-cols-12",
+                grid === 16 && "grid-cols-16",
               )}
             >
               {section.entries.map((entry) => (

@@ -16,7 +16,8 @@ export interface LibraryAPI {
     mangaId: string,
     mangaSource: string,
   ) => Promise<void>;
-  findCategoryForManga: (mangaEntry: MangaEntry) => Promise<Category | null>;
+  findCategoryForManga: (mangaEntry: MangaEntry) => Promise<string | null>;
+  isMangaInLibrary: (mangaEntry: MangaEntry) => Promise<boolean>;
 }
 
 class LibraryAPIImpl implements LibraryAPI {
@@ -129,18 +130,32 @@ class LibraryAPIImpl implements LibraryAPI {
     }
   }
 
-  async findCategoryForManga(mangaEntry: MangaEntry): Promise<Category | null> {
+  async findCategoryForManga(mangaEntry: MangaEntry): Promise<string | null> {
     if (!mangaEntry || !mangaEntry.identifier || !mangaEntry.source) {
       throw new Error("Manga entry with identifier and source is required");
     }
 
     try {
-      return await invoke<Category | null>("find_category_for_manga", {
+      return await invoke<string | null>("find_category_for_manga", {
         mangaEntry,
       });
     } catch (error) {
       throw new Error(
         `Failed to find category for manga '${mangaEntry.title}': ${error}`,
+      );
+    }
+  }
+
+  async isMangaInLibrary(mangaEntry: MangaEntry): Promise<boolean> {
+    if (!mangaEntry || !mangaEntry.identifier || !mangaEntry.source) {
+      throw new Error("Manga entry with identifier and source is required");
+    }
+
+    try {
+      return await invoke<boolean>("is_manga_in_library", { mangaEntry });
+    } catch (error) {
+      throw new Error(
+        `Failed to check if manga '${mangaEntry.title}' is in library: ${error}`,
       );
     }
   }

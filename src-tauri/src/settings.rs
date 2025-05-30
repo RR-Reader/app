@@ -16,7 +16,7 @@ pub struct AppSettings {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct LayoutAppearanceSettings {
-    pub grid_size: String,
+    pub grid_size: i64,
     pub theme: String,
     pub cover_style: String,
     pub show_titles: bool,
@@ -70,7 +70,7 @@ pub struct ExperimentalSettings {
 impl Default for LayoutAppearanceSettings {
     fn default() -> Self {
         Self {
-            grid_size: "12".to_string(),
+            grid_size: 12,
             theme: "system".to_string(),
             cover_style: "rounded".to_string(),
             show_titles: true,
@@ -201,7 +201,7 @@ impl AppSettings {
     ) -> Result<(), String> {
         match key {
             "grid_size" => {
-                self.layout_appearance.grid_size = value.as_str().unwrap_or("12").to_string()
+                self.layout_appearance.grid_size = value.as_i64().unwrap_or(12);
             }
             "theme" => {
                 self.layout_appearance.theme = value.as_str().unwrap_or("system").to_string()

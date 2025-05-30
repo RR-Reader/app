@@ -99,9 +99,60 @@ impl Library {
             .find(|cat| cat.title == "All Titles")
         {
             all_category.entries.push(manga_entry);
-            all_category.entries.sort_by(|a, b| a.title.cmp(&b.title)); // Sort by title
+            all_category.entries.sort_by(|a, b| a.title.cmp(&b.title));
         } else {
             return Err("Default category 'All Titles' does not exist".to_string());
+        }
+
+        self.save()
+    }
+
+    pub fn remove_manga(
+        &mut self,
+        category_name: &str,
+        manga_id: &str,
+        manga_source: &str,
+    ) -> Result<(), String> {
+        println!(
+            "Removing manga: category={}, id={}, source={}",
+            category_name, manga_id, manga_source
+        );
+
+        let mut manga_found = false;
+
+        if let Some(category) = self
+            .categories
+            .iter_mut()
+            .find(|cat| cat.title == category_name)
+        {
+            let initial_len = category.entries.len();
+            category.entries.retain(|entry| {
+                let should_keep = !(entry.identifier == manga_id && entry.source == manga_source);
+                if !should_keep {
+                    manga_found = true;
+                    println!("Found and removing manga from category '{}'", category_name);
+                }
+                should_keep
+            });
+
+            if category.entries.len() == initial_len && !manga_found {
+                return Err(format!("Manga not found in category '{}'", category_name));
+            }
+        } else {
+            return Err(format!("Category '{}' does not exist", category_name));
+        }
+
+        if category_name != "All Titles" {
+            if let Some(all_category) = self
+                .categories
+                .iter_mut()
+                .find(|cat| cat.title == "All Titles")
+            {
+                all_category.entries.retain(|entry| {
+                    !(entry.identifier == manga_id && entry.source == manga_source)
+                });
+                println!("Also removed from 'All Titles' category");
+            }
         }
 
         self.save()
@@ -148,15 +199,41 @@ pub fn get_category_by_slug(slug: String) -> Result<Category, String> {
 }
 
 #[tauri::command]
+pub fn is_manga_in_library(manga_entry: MangaEntry) -> Result<bool, String> {
+    let library: Library = Library::load()?;
+    Ok(library.manga_exists(&manga_entry))
+}
+
+#[tauri::command]
 pub fn create_category(category_name: String) -> Result<(), String> {
     let mut library: Library = Library::load()?;
     library.create_category(&category_name)
 }
 
 #[tauri::command]
-pub fn save_manga(category_name: String, manga_entry: MangaEntry) -> Result<(), String> {
+pub fn add_manga_to_category(category_name: String, manga_entry: MangaEntry) -> Result<(), String> {
     let mut library: Library = Library::load()?;
     library.add_manga(&category_name, Arc::new(manga_entry))
+}
+
+#[tauri::command]
+pub fn remove_manga_from_category(
+    category_name: String,
+    manga_id: String,
+    manga_source: String,
+) -> Result<(), String> {
+    println!("Tauri command: remove_manga_from_category called with: category_name={}, manga_id={}, manga_source={}", 
+             category_name, manga_id, manga_source);
+
+    if category_name.trim().is_empty()
+        || manga_id.trim().is_empty()
+        || manga_source.trim().is_empty()
+    {
+        return Err("Category name, manga ID, and source are required".to_string());
+    }
+
+    let mut library = Library::load()?;
+    library.remove_manga(&category_name, &manga_id, &manga_source)
 }
 
 #[tauri::command]

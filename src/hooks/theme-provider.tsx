@@ -1,6 +1,6 @@
 // hooks/theme/theme-provider.tsx
 import { createContext, useContext, ReactNode } from "react";
-import { useTheme } from "./settings/use-theme";
+import { useTheme } from "./use-theme";
 
 type ThemeContextType = ReturnType<typeof useTheme>;
 

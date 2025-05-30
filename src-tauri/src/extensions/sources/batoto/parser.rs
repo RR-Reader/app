@@ -8,7 +8,7 @@ use std::collections::HashMap;
 
 pub fn extract_latest_titles(
     html_content: &str,
-    limit: usize,
+    limit: &usize,
 ) -> Result<Vec<String>, ScrapingError> {
     let document: Html = Html::parse_document(html_content);
 
@@ -34,7 +34,7 @@ pub fn extract_latest_titles(
                 titles.push(title);
             }
 
-            if titles.len() >= limit {
+            if titles.len() >= *limit {
                 break;
             }
         }
@@ -50,7 +50,7 @@ pub fn extract_latest_titles(
 pub fn extract_latest_entries(
     html_content: &str,
     missing_titles: &[String],
-    limit: usize,
+    limit: &usize,
 ) -> Result<Vec<MangaEntry>, ScrapingError> {
     let document: Html = Html::parse_document(html_content);
 
@@ -104,7 +104,7 @@ pub fn extract_latest_entries(
                 entries.push(entry);
             }
 
-            if entries.len() >= limit {
+            if entries.len() >= *limit {
                 break;
             }
         }
@@ -119,7 +119,7 @@ pub fn extract_latest_entries(
 
 pub fn extract_popular_titles(
     html_content: &str,
-    limit: usize,
+    limit: &usize,
 ) -> Result<Vec<String>, ScrapingError> {
     let document = Html::parse_document(html_content);
 
@@ -145,7 +145,7 @@ pub fn extract_popular_titles(
                 titles.push(title);
             }
 
-            if titles.len() >= limit {
+            if titles.len() >= *limit {
                 break;
             }
         }
@@ -161,7 +161,7 @@ pub fn extract_popular_titles(
 pub fn extract_popular_entries(
     html_content: &str,
     missing_titles: &[String],
-    limit: usize,
+    limit: &usize,
 ) -> Result<Vec<MangaEntry>, ScrapingError> {
     let document = Html::parse_document(html_content);
 
@@ -215,7 +215,7 @@ pub fn extract_popular_entries(
                 entries.push(entry);
             }
 
-            if entries.len() >= limit {
+            if entries.len() >= *limit {
                 break;
             }
         }
@@ -340,6 +340,7 @@ pub fn extract_series_details(
                 title,
                 url,
                 released_since,
+                read_status: false,
             });
         }
     } else {

@@ -6,7 +6,7 @@ export const coverVariants = cva(
   {
     variants: {
       style: {
-        rounded: "rounded-lg",
+        rounded: "rounded-2xl",
         square: "rounded-none",
         border: "rounded-lg border-2",
         shadow: "rounded-lg shadow-lg hover:shadow-xl",

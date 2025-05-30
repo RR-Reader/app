@@ -15,12 +15,13 @@ use super::batoto::manga::get_batoto_manga;
 pub async fn load_explore_pages(
     cache: State<'_, EntryCache>,
     source: &str,
+    limit: u64,
 ) -> Result<Vec<ExplorePage>, String> {
     let mut pages: Vec<ExplorePage> = Vec::new();
 
     match source {
         "batoto" => {
-            let page = get_batoto_page(cache).await?;
+            let page = get_batoto_page(cache, &limit).await?;
             pages.push(page);
         }
         _ => return Err(format!("Unsupported source: {}", source)),

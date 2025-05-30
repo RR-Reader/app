@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export interface AppSettings {
   layout_appearance: {
-    grid_size: string;
+    grid_size: number;
     theme: string;
     cover_style: string;
     show_titles: boolean;

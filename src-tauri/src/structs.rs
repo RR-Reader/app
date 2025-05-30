@@ -27,6 +27,7 @@ pub struct ChapterEntry {
     pub title: String,
     pub url: String,
     pub released_since: String,
+    pub read_status: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
