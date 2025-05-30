@@ -20,8 +20,8 @@ const useLoadLibrary = () =>
     queryFn: libraryAPI.loadLibrary,
     refetchOnWindowFocus: true,
     retry: 2,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 1000 * 60 * 5, 
+    gcTime: 1000 * 60 * 10,
   });
 
 const useFetchCategory = (slug: string | undefined) =>
@@ -31,7 +31,7 @@ const useFetchCategory = (slug: string | undefined) =>
     enabled: !!slug,
     refetchOnWindowFocus: true,
     retry: 2,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 2,
   });
 
 const useIsMangaInLibrary = (mangaEntry: MangaEntry) =>
@@ -42,7 +42,7 @@ const useIsMangaInLibrary = (mangaEntry: MangaEntry) =>
     ),
     queryFn: () => libraryAPI.isMangaInLibrary(mangaEntry),
     enabled: !!(mangaEntry.identifier && mangaEntry.source),
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 2, 
   });
 
 const useFindMangaCategory = (mangaEntry: MangaEntry) =>
@@ -53,7 +53,7 @@ const useFindMangaCategory = (mangaEntry: MangaEntry) =>
     ),
     queryFn: () => libraryAPI.findCategoryForManga(mangaEntry),
     enabled: !!(mangaEntry.identifier && mangaEntry.source),
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 2, 
   });
 
 // Mutation Hooks
