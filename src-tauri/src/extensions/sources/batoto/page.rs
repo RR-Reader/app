@@ -1,5 +1,6 @@
-use super::client::BatotoClient;
+use super::client::BatotoSource;
 use crate::{
+    source::{SourceMethods, SourceResult},
     structs::{ExplorePage, ExploreSection},
     EntryCache,
 };
@@ -9,8 +10,8 @@ use tauri::{command, State};
 pub async fn get_batoto_page(
     cache: State<'_, EntryCache>,
     limit: &u64,
-) -> Result<ExplorePage, String> {
-    let client: BatotoClient = BatotoClient::new();
+) -> SourceResult<ExplorePage> {
+    let client: BatotoSource = BatotoSource::new();
 
     let limit_usize = *limit as usize;
 

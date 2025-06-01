@@ -1,18 +1,17 @@
-use std::sync::Arc;
-
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MangaEntry {
     pub source: String,
-    pub identifier: String,
+    pub id: String,
     pub title: String,
     pub cover_url: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Manga {
-    pub identifier: String,
+    pub id: String,
     pub title: String,
     pub artists: Vec<String>,
     pub authors: Vec<String>,
@@ -24,14 +23,14 @@ pub struct Manga {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ChapterEntry {
+    pub id: String,
     pub title: String,
-    pub url: String,
     pub released_since: String,
-    pub read_status: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Chapter {
+    pub id: String,
     pub url: String,
     pub pages: Vec<String>,
 }

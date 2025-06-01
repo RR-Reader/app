@@ -1,30 +1,21 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+mod error;
 mod extensions;
 mod library;
+mod preferences;
 mod settings;
+mod source;
 mod structs;
 mod utils;
 
-use crate::structs::{Manga, MangaEntry};
+use crate::extensions::sources::handler::{load_explore_pages, load_manga_source};
+use structs::{Manga, MangaEntry};
 use moka::future::Cache;
 use std::sync::Arc;
-use tauri::{command, State};
-
-use crate::extensions::sources::handler::{load_explore_pages, load_source_chapter};
 
 pub type EntryCache = Cache<String, Arc<MangaEntry>>;
 pub type MangaCache = Cache<String, Arc<Manga>>;
-
-#[command]
-async fn clean_manga_cache(cache: State<'_, EntryCache>) -> Result<(), String> {
-    cache.invalidate_all();
-    Ok(())
-}
-
-#[command]
-async fn get_cache_stats(cache: State<'_, EntryCache>) -> Result<(u64, u64), String> {
-    Ok((cache.entry_count(), cache.weighted_size()))
-}
+pub type ChapterCache = Cache<String, Arc<str>>;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -43,10 +34,10 @@ pub fn run() {
         .manage(entry_cache)
         .manage(manga_cache)
         .invoke_handler(tauri::generate_handler![
-            clean_manga_cache,
-            get_cache_stats,
             load_explore_pages,
-            load_source_chapter,
+            load_manga_source,
+            settings::get_cache_stats,
+            settings::clean_manga_cache,
             library::load_library,
             library::create_category,
             library::add_manga_to_category,
@@ -54,10 +45,10 @@ pub fn run() {
             library::find_category_for_manga,
             library::is_manga_in_library,
             library::remove_manga_from_category,
-            settings::load_settings,
-            settings::update_setting,
-            settings::reset_settings,
-            settings::get_setting_section,
+            preferences::load_preferences,
+            preferences::update_preference,
+            preferences::reset_preferences,
+            preferences::get_preference_section,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

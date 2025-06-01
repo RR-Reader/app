@@ -2,40 +2,18 @@ use moka::future::Cache;
 use scraper::Selector;
 use std::{collections::HashMap, sync::Arc};
 
-use crate::structs::MangaEntry;
 
-#[derive(Debug)]
-pub enum ScrapingError {
-    NetworkError(String),
-    ParseError(String),
-    SelectorError(String),
-}
-
-impl std::fmt::Display for ScrapingError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ScrapingError::NetworkError(msg) => write!(f, "Network error: {}", msg),
-            ScrapingError::ParseError(msg) => write!(f, "Parse error: {}", msg),
-            ScrapingError::SelectorError(msg) => write!(f, "Selector error: {}", msg),
-        }
-    }
-}
-
-impl From<ScrapingError> for String {
-    fn from(error: ScrapingError) -> Self {
-        error.to_string()
-    }
-}
+use crate::{structs::MangaEntry, error::SourceError};
 
 pub fn create_selectors(
     selectors: &[(&str, &str)],
-) -> Result<HashMap<String, Selector>, ScrapingError> {
+) -> Result<HashMap<String, Selector>, SourceError> {
     selectors
         .iter()
         .map(|(name, css)| {
             Selector::parse(css)
                 .map(|sel| (name.to_string(), sel))
-                .map_err(|e| ScrapingError::SelectorError(format!("{name}: {e}")))
+                .map_err(|e| SourceError::Parsing(format!("{name}: {e}")))
         })
         .collect()
 }

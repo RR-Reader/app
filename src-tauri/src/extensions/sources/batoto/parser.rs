@@ -1,6 +1,7 @@
 use crate::{
+    error::SourceError,
     structs::{ChapterEntry, Manga, MangaEntry},
-    utils::{create_selectors, ScrapingError},
+    utils::create_selectors,
 };
 use regex::Regex;
 use scraper::{Html, Selector};
@@ -9,7 +10,7 @@ use std::collections::HashMap;
 pub fn extract_latest_titles(
     html_content: &str,
     limit: &usize,
-) -> Result<Vec<String>, ScrapingError> {
+) -> Result<Vec<String>, SourceError> {
     let document: Html = Html::parse_document(html_content);
 
     let selector_defs: [(&str, &str); 3] = [
@@ -39,7 +40,7 @@ pub fn extract_latest_titles(
             }
         }
     } else {
-        return Err(ScrapingError::ParseError(
+        return Err(SourceError::Parsing(
             "Could not find base container".to_string(),
         ));
     }
@@ -51,7 +52,7 @@ pub fn extract_latest_entries(
     html_content: &str,
     missing_titles: &[String],
     limit: &usize,
-) -> Result<Vec<MangaEntry>, ScrapingError> {
+) -> Result<Vec<MangaEntry>, SourceError> {
     let document: Html = Html::parse_document(html_content);
 
     let selector_defs: [(&str, &str); 4] = [
@@ -90,12 +91,12 @@ pub fn extract_latest_entries(
                     continue;
                 }
 
-                let identifier = extract_id_from_url(&title_url).ok_or_else(|| {
-                    ScrapingError::ParseError("Failed to extract ID from URL".to_string())
+                let id = extract_id_from_url(&title_url, "series").ok_or_else(|| {
+                    SourceError::Parsing("Failed to extract ID from URL".to_string())
                 })?;
 
                 let entry = MangaEntry {
-                    identifier,
+                    id,
                     title,
                     cover_url,
                     source: "batoto".to_string(),
@@ -109,7 +110,7 @@ pub fn extract_latest_entries(
             }
         }
     } else {
-        return Err(ScrapingError::ParseError(
+        return Err(SourceError::Parsing(
             "Could not find base container".to_string(),
         ));
     }
@@ -120,7 +121,7 @@ pub fn extract_latest_entries(
 pub fn extract_popular_titles(
     html_content: &str,
     limit: &usize,
-) -> Result<Vec<String>, ScrapingError> {
+) -> Result<Vec<String>, SourceError> {
     let document = Html::parse_document(html_content);
 
     let selector_defs: [(&'static str, &'static str); 3] = [
@@ -150,7 +151,7 @@ pub fn extract_popular_titles(
             }
         }
     } else {
-        return Err(ScrapingError::ParseError(
+        return Err(SourceError::Parsing(
             "Could not find base container".to_string(),
         ));
     }
@@ -162,7 +163,7 @@ pub fn extract_popular_entries(
     html_content: &str,
     missing_titles: &[String],
     limit: &usize,
-) -> Result<Vec<MangaEntry>, ScrapingError> {
+) -> Result<Vec<MangaEntry>, SourceError> {
     let document = Html::parse_document(html_content);
 
     let selector_defs: [(&'static str, &'static str); 4] = [
@@ -201,13 +202,13 @@ pub fn extract_popular_entries(
                     continue;
                 }
 
-                let identifier = extract_id_from_url(&title_url).ok_or_else(|| {
-                    ScrapingError::ParseError("Failed to extract ID from URL".to_string())
+                let id = extract_id_from_url(&title_url, "series").ok_or_else(|| {
+                    SourceError::Parsing("Failed to extract ID from URL".to_string())
                 })?;
 
                 let entry = MangaEntry {
+                    id,
                     title,
-                    identifier,
                     cover_url,
                     source: "batoto".to_string(),
                 };
@@ -220,7 +221,7 @@ pub fn extract_popular_entries(
             }
         }
     } else {
-        return Err(ScrapingError::ParseError(
+        return Err(SourceError::Parsing(
             "Could not find base container".to_string(),
         ));
     }
@@ -228,26 +229,32 @@ pub fn extract_popular_entries(
     Ok(entries)
 }
 
-pub fn construct_url_from_id(identifier: &str) -> String {
-    format!("https://battwo.com/series/{identifier}")
+pub fn construct_url_from_id(id: &str, url_type: &str) -> String {
+    match url_type {
+        "series" => format!("/series/{}", id),
+        "chapter" => format!("/chapter/{}", id),
+        _ => format!("/series/{}", id),
+    }
 }
 
-pub fn extract_id_from_url(url: &str) -> Option<String> {
-    let re = Regex::new(r"/series/(\d+)").unwrap();
+pub fn extract_id_from_url(url: &str, url_type: &str) -> Option<String> {
+    let re: Regex = match url_type {
+        "series" => Regex::new(r"/series/(\d+)").unwrap(),
+        "chapter" => Regex::new(r"/chapter/(\d+)").unwrap(),
+        _ => return None,
+    };
+
     re.captures(url)
         .and_then(|caps| caps.get(1).map(|m| m.as_str().to_string()))
 }
 
-pub fn extract_series_details(
-    html_content: &str,
-    identifier: &str,
-) -> Result<Manga, ScrapingError> {
+pub fn extract_series_details(html_content: &str, id: &str) -> Result<Manga, SourceError> {
     let document: Html = Html::parse_document(html_content);
 
-    let url: String = construct_url_from_id(identifier);
+    let url: String = construct_url_from_id(id, "series");
 
-    let identifier: String =
-        extract_id_from_url(&url).expect("Failed to extract series ID from URL");
+    let id: String =
+        extract_id_from_url(&url, "series").expect("Failed to extract series ID from URL");
 
     let selector_defs: [(&'static str, &'static str); 11] = [
         ("title", "h3.item-title"),
@@ -330,6 +337,10 @@ pub fn extract_series_details(
                 .unwrap_or("")
                 .to_string();
 
+            let id = extract_id_from_url(&url, "chapter").ok_or_else(|| {
+                SourceError::Parsing("Failed to extract chapter ID from URL".to_string())
+            })?;
+
             let released_since = item
                 .select(&selector_map["chapter-date"])
                 .next()
@@ -337,20 +348,19 @@ pub fn extract_series_details(
                 .unwrap_or_else(|| "Unknown".to_string());
 
             chapters.push(ChapterEntry {
+                id,
                 title,
-                url,
                 released_since,
-                read_status: false,
             });
         }
     } else {
-        return Err(ScrapingError::ParseError(
+        return Err(SourceError::Parsing(
             "Could not find chapter list".to_string(),
         ));
     }
 
     let manga_base = Manga {
-        identifier,
+        id,
         title,
         description,
         artists,
