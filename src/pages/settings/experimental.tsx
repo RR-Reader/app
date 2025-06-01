@@ -2,15 +2,15 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { SettingItem } from "@/components/settings/settings-item";
 import { SettingRenderer } from "@/components/settings/settings-renderer";
-import { useSettings } from "@/hooks/settings/use-settings";
+import { usePreferences } from "@/hooks/settings/use-settings";
 import { FlaskRound } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 
 export default function Experimental() {
-  const { settings, updateSetting } = useSettings();
+  const { preferences, updatePreferences } = usePreferences();
 
-  if (!settings) return <div>Loading...</div>;
+  if (!preferences) return <div>Loading...</div>;
 
   return (
     <div className="max-w-2xl">
@@ -46,9 +46,9 @@ export default function Experimental() {
                 description: "Allow loading manga from custom source plugins.",
                 type: "switch",
               }}
-              value={settings.experimental.enable_custom_sources}
+              value={preferences.experimental.enable_custom_sources}
               onChange={(value) =>
-                updateSetting({
+                updatePreferences({
                   section: "experimental",
                   key: "enable_custom_sources",
                   value,
@@ -68,9 +68,9 @@ export default function Experimental() {
                 description: "Show detailed logs for troubleshooting issues.",
                 type: "switch",
               }}
-              value={settings.experimental.enable_debug_logging}
+              value={preferences.experimental.enable_debug_logging}
               onChange={(value) =>
-                updateSetting({
+                updatePreferences({
                   section: "experimental",
                   key: "enable_debug_logging",
                   value,
@@ -91,9 +91,9 @@ export default function Experimental() {
                   "Display performance metrics for testing purposes.",
                 type: "switch",
               }}
-              value={settings.experimental.show_fps_counter}
+              value={preferences.experimental.show_fps_counter}
               onChange={(value) =>
-                updateSetting({
+                updatePreferences({
                   section: "experimental",
                   key: "show_fps_counter",
                   value,
@@ -114,9 +114,9 @@ export default function Experimental() {
                   "Use GPU acceleration for image rendering (may cause issues on some systems).",
                 type: "switch",
               }}
-              value={settings.experimental.hardware_acceleration}
+              value={preferences.experimental.hardware_acceleration}
               onChange={(value) =>
-                updateSetting({
+                updatePreferences({
                   section: "experimental",
                   key: "hardware_acceleration",
                   value,

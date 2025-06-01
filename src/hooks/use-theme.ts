@@ -1,12 +1,13 @@
-import { useSettings } from "@/hooks/settings/use-settings";
+import { usePreferences } from "@/hooks/settings/use-settings";
 import { useEffect } from "react";
 
 type Theme = "dark" | "light" | "system";
 
 export function useTheme() {
-  const { settings, updateSetting, isLoading, isUpdating } = useSettings();
+  const { preferences, updatePreferences, isLoading, isUpdating } =
+    usePreferences();
 
-  const theme = (settings?.layout_appearance?.theme as Theme) || "system";
+  const theme = (preferences?.layout_appearance?.theme as Theme) || "system";
 
   useEffect(() => {
     if (isLoading || isUpdating) return;
@@ -40,7 +41,7 @@ export function useTheme() {
   }, [theme]);
 
   const setTheme = (newTheme: Theme) => {
-    updateSetting({
+    updatePreferences({
       section: "layout_appearance",
       key: "theme",
       value: newTheme,

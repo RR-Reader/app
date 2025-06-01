@@ -1,4 +1,4 @@
-import type { SettingSection } from "@/types/settings";
+import type { PreferencesSection } from "@/types/preferences";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { useState } from "react";
 import { SettingRenderer } from "./settings-renderer";
@@ -6,7 +6,7 @@ import { SettingItem } from "./settings-item";
 
 interface SettingsSectionProps {
   key: string;
-  section: SettingSection;
+  section: PreferencesSection;
 }
 
 export function SettingsSection({ section }: SettingsSectionProps) {

@@ -2,8 +2,10 @@ import { MangaCard, ViewMoreCard } from "@/components/manga-card";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import EXPLORE from "@/hooks/use-explore";
-import { useParams, Link } from "react-router";
+import { useParams, Link, useNavigate } from "react-router";
 import { useGrid } from "@/hooks/settings/use-grid";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ExploreContextMenu } from "@/components/context-menus/explore-context";
 
 function ErrorFallback({
   error,
@@ -54,74 +56,91 @@ export default function Explore() {
   const { data, isLoading, error, refetch, isRefetching } =
     EXPLORE.useFetchExplorePages(source);
 
+  const navigate = useNavigate();
+
   const sourceList = [
-    { name: "Batoto", path: "/explore/batoto" },
-    { name: "Mangadex", path: "/explore/mangadex" },
-    { name: "WeebCentral", path: "/explore/weebcentral" },
+    { name: "All Sources", path: "" },
+    { name: "Batoto", path: "batoto" },
+    { name: "Mangadex", path: "mangadex" },
+    { name: "WeebCentral", path: "weebcentral" },
   ];
 
-  if (!source) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center">
-        <p className="mb-4 text-4xl font-semibold">No source selected</p>
-        <div className="flex gap-4">
-          {sourceList.map((src) => (
-            <Link key={src.name} to={src.path}>
-              <Button className="w-28 cursor-pointer">{src.name}</Button>
-            </Link>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const handleTabChange = (value: string) => {
+    navigate(`/explore/${value}`);
+  };
 
   console.log("data", data);
 
   const explorePage = data?.[0];
 
   return (
-    <div className="h-full overflow-hidden">
-      {(isLoading || isRefetching) && <LoadingSkeleton grid={grid} />}
-
-      {error && (
-        <ErrorFallback
-          error={error as Error}
-          onRetry={() => {
-            refetch();
-          }}
-        />
-      )}
-
-      {data &&
-        !isLoading &&
-        !isRefetching &&
-        explorePage?.sections.map((section) => (
-          <div>
-            <h1 className="mt-2 mb-4 ml-2 text-3xl font-bold">
-              {section.title}
-            </h1>
-            <div
-              className={cn(
-                "grid gap-4 p-4",
-                grid === 6 && "grid-cols-6",
-                grid === 8 && "grid-cols-8",
-                grid === 12 && "grid-cols-12",
-                grid === 16 && "grid-cols-16",
-              )}
-            >
-              {section.entries.map((entry) => (
-                <MangaCard
-                  source={entry.source}
-                  identifier={entry.identifier}
-                  title={entry.title}
-                  coverUrl={entry.cover_url}
-                />
-              ))}
-
-              <ViewMoreCard source={source} />
-            </div>
+    <ExploreContextMenu>
+      <Tabs
+        className="h-full"
+        value={source || ""}
+        onValueChange={handleTabChange}
+      >
+        <TabsList className="w-full justify-start">
+          {sourceList.map((src) => (
+            <TabsTrigger key={src.name} value={src.path} className="max-w-28">
+              {src.name}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <TabsContent value="">
+          <div className="flex h-full flex-col items-center justify-center">
+            <p className="mb-4 text-4xl font-semibold">No source selected</p>
           </div>
+        </TabsContent>
+        {sourceList.map((src) => (
+          <TabsContent value={src.path} key={src.name}>
+            <div className="h-full overflow-hidden">
+              {(isLoading || isRefetching) && <LoadingSkeleton grid={grid} />}
+
+              {error && (
+                <ErrorFallback
+                  error={error as Error}
+                  onRetry={() => {
+                    refetch();
+                  }}
+                />
+              )}
+
+              {data &&
+                !isLoading &&
+                !isRefetching &&
+                explorePage?.sections.map((section) => (
+                  <div key={section.title} className="mb-8">
+                    <h1 className="mt-2 mb-4 ml-2 text-3xl font-bold">
+                      {section.title}
+                    </h1>
+                    <div
+                      className={cn(
+                        "grid grid-cols-3 gap-4 p-4",
+                        grid === 6 && "sm:grid-cols-6",
+                        grid === 8 && "sm:grid-cols-8",
+                        grid === 12 && "sm:grid-cols-12",
+                        grid === 16 && "sm:grid-cols-16",
+                      )}
+                    >
+                      {section.entries.map((entry) => (
+                        <MangaCard
+                          key={entry.id}
+                          source={entry.source}
+                          id={entry.id}
+                          title={entry.title}
+                          coverUrl={entry.cover_url}
+                        />
+                      ))}
+
+                      <ViewMoreCard source={source} />
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </TabsContent>
         ))}
-    </div>
+      </Tabs>
+    </ExploreContextMenu>
   );
 }

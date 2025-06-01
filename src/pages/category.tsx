@@ -80,9 +80,9 @@ export default function Category() {
           >
             {data.entries.map((entry) => (
               <MangaCard
-                key={`${entry.source}-${entry.identifier}`}
+                key={`${entry.source}-${entry.id}`}
                 source={entry.source}
-                identifier={entry.identifier}
+                id={entry.id}
                 title={entry.title}
                 coverUrl={entry.cover_url}
               />

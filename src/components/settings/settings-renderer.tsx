@@ -1,4 +1,4 @@
-import { Setting } from "@/types/settings";
+import { Preferences } from "@/types/preferences";
 import {
   Select,
   SelectContent,
@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { FolderOpen } from "lucide-react";
 
 interface SettingRendererProps {
-  setting: Setting;
+  setting: Preferences;
   value: any;
   onChange: (value: any) => void;
 }

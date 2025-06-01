@@ -43,6 +43,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
+import { CardContextMenu } from "@/components/context-menus/manga-card-menu";
+
 interface MangaAddProps {
   onAdd: (manga: MangaEntry, category: string) => Promise<void>;
   manga: MangaEntry;
@@ -211,22 +213,20 @@ function RemoveMangaDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isRemoving}>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleRemove}
-            disabled={isRemoving}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-          >
-            {isRemoving ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Removing...
-              </>
-            ) : (
-              <>
-                <Trash2 className="mr-2 h-4 w-4" />
-                Remove
-              </>
-            )}
+          <AlertDialogAction asChild>
+            <Button onClick={handleRemove} disabled={isRemoving}>
+              {isRemoving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Removing...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Remove
+                </>
+              )}
+            </Button>
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -235,19 +235,18 @@ function RemoveMangaDialog({
 }
 
 export default function MangaDetail() {
-  const { identifier, source } = useParams<{
-    identifier: string;
+  const { id, source } = useParams<{
+    id: string;
     source: string;
   }>();
   const { coverStyle } = useCoverStyle();
 
-  const { data, isLoading, error } = MANGA_HOOKS.useQueryMangaInfo(
-    identifier,
-    source,
-  );
+  const { data, isLoading, error } = MANGA_HOOKS.useQueryMangaInfo(id, source);
+
+  console.log("Manga Data", data);
 
   const mangaEntry: MangaEntry = {
-    identifier: identifier!,
+    id: id!,
     title: data?.title || "Unknown Title",
     source: source!,
     cover_url: data?.cover_url || "",
@@ -272,7 +271,7 @@ export default function MangaDetail() {
     console.log("Remove manga debug:", {
       category,
       categoryType: typeof category,
-      mangaId: manga.identifier,
+      mangaId: manga.id,
       mangaSource: manga.source,
     });
 
@@ -286,8 +285,8 @@ export default function MangaDetail() {
       throw new Error("Category name is empty");
     }
 
-    if (!manga.identifier?.trim()) {
-      throw new Error("Manga identifier is empty");
+    if (!manga.id?.trim()) {
+      throw new Error("Manga ID is empty");
     }
 
     if (!manga.source?.trim()) {
@@ -296,7 +295,7 @@ export default function MangaDetail() {
 
     return removeMangaFromCategory({
       categoryName: category,
-      mangaId: manga.identifier,
+      mangaId: manga.id,
       mangaSource: manga.source,
     });
   };
@@ -331,11 +330,13 @@ export default function MangaDetail() {
   if (error) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-destructive text-center">
-          <p className="text-lg font-semibold">Error loading manga details</p>
+        <div className="text-center">
+          <p className="text-primary text-lg font-semibold">
+            Error loading manga details
+          </p>
           <p className="text-muted-foreground text-sm">{error.message}</p>
           <p className="text-muted-foreground mt-2 text-xs">
-            Identifier: {identifier} | Source: {source}
+            Source: {source} | Manga ID: {id}
           </p>
         </div>
       </div>
@@ -345,16 +346,18 @@ export default function MangaDetail() {
   return (
     <div className="container mx-auto max-w-6xl p-4">
       <div className="flex flex-col gap-6 lg:flex-row">
-        <div className="flex-shrink-0">
-          <img
-            src={data?.cover_url}
-            alt={data?.title}
-            className={cn(
-              coverVariants({ style: coverStyle, type: "image" }),
-              "mx-auto h-auto max-h-96 w-full max-w-sm lg:mx-0",
-            )}
-          />
-        </div>
+        <CardContextMenu>
+          <div className="flex-shrink-0">
+            <img
+              src={data?.cover_url}
+              alt={data?.title}
+              className={cn(
+                coverVariants({ style: coverStyle, type: "image" }),
+                "mx-auto h-auto max-h-96 w-full max-w-sm lg:mx-0",
+              )}
+            />
+          </div>
+        </CardContextMenu>
 
         <div className="flex-1 space-y-4">
           <div className="flex items-start justify-between gap-4">
@@ -410,7 +413,9 @@ export default function MangaDetail() {
               <p className="text-primary text-sm font-semibold">Genres</p>
               <div className="flex flex-wrap gap-2">
                 {data.genres.map((genre) => (
-                  <Badge variant="outline">{genre}</Badge>
+                  <Badge key={genre} variant="outline">
+                    {genre}
+                  </Badge>
                 ))}
               </div>
             </div>
@@ -429,12 +434,8 @@ export default function MangaDetail() {
 
       {/* TODO */}
       {/* Chapters Section - Add this later */}
-      <div className="mt-8">
-        <h2 className="mb-4 text-xl font-semibold">Chapters</h2>
-        <div className="bg-muted rounded-lg p-8 text-center">
-          {data?.chapters && <ChapterTable data={data?.chapters} />}
-        </div>
-      </div>
+
+      {data?.chapters && <ChapterTable data={data?.chapters} />}
     </div>
   );
 }

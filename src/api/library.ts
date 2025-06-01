@@ -1,7 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
-import { Category, Library, MangaEntry } from "..";
+import { Category, Library, MangaEntry } from "@/types";
 
-export interface LibraryAPI {
+interface LibraryAPI {
   loadLibrary: () => Promise<Library>;
   getCategoryBySlug: (slug: string) => Promise<Category>;
   createCategory: (categoryName: string) => Promise<void>;
@@ -23,8 +23,12 @@ export interface LibraryAPI {
 class LibraryAPIImpl implements LibraryAPI {
   async loadLibrary(): Promise<Library> {
     try {
-      return await invoke<Library>("load_library");
+      console.log("Loading library...");
+      const result = await invoke<Library>("load_library");
+      console.log("Library loaded successfully:", result);
+      return result;
     } catch (error) {
+      console.error("Library load error:", error);
       throw new Error(`Failed to load library: ${error}`);
     }
   }
@@ -131,8 +135,8 @@ class LibraryAPIImpl implements LibraryAPI {
   }
 
   async findCategoryForManga(mangaEntry: MangaEntry): Promise<string | null> {
-    if (!mangaEntry || !mangaEntry.identifier || !mangaEntry.source) {
-      throw new Error("Manga entry with identifier and source is required");
+    if (!mangaEntry || !mangaEntry.id || !mangaEntry.source) {
+      throw new Error("Manga entry with ID and source is required");
     }
 
     try {
@@ -147,8 +151,8 @@ class LibraryAPIImpl implements LibraryAPI {
   }
 
   async isMangaInLibrary(mangaEntry: MangaEntry): Promise<boolean> {
-    if (!mangaEntry || !mangaEntry.identifier || !mangaEntry.source) {
-      throw new Error("Manga entry with identifier and source is required");
+    if (!mangaEntry || !mangaEntry.id || !mangaEntry.source) {
+      throw new Error("Manga entry with ID and source is required");
     }
 
     try {
@@ -162,4 +166,4 @@ class LibraryAPIImpl implements LibraryAPI {
 }
 
 const libraryAPI: LibraryAPI = new LibraryAPIImpl();
-export { LibraryAPIImpl, libraryAPI };
+export { type LibraryAPI, LibraryAPIImpl, libraryAPI };

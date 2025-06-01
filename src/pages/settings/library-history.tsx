@@ -1,13 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { SettingItem } from "@/components/settings/settings-item";
 import { SettingRenderer } from "@/components/settings/settings-renderer";
-import { useSettings } from "@/hooks/settings/use-settings";
+import { usePreferences } from "@/hooks/settings/use-settings";
 import { Library } from "lucide-react";
 
 export default function LibraryHistory() {
-  const { settings, updateSetting } = useSettings();
+  const { preferences, updatePreferences } = usePreferences();
 
-  if (!settings) return <div>Loading...</div>;
+  if (!preferences) return <div>Loading...</div>;
 
   return (
     <div className="max-w-2xl">
@@ -34,9 +34,9 @@ export default function LibraryHistory() {
                 description: "Track and save your reading progress.",
                 type: "switch",
               }}
-              value={settings.library_history.enable_history}
+              value={preferences.library_history.enable_history}
               onChange={(value) =>
-                updateSetting({
+                updatePreferences({
                   section: "library_history",
                   key: "enable_history",
                   value,
@@ -62,9 +62,9 @@ export default function LibraryHistory() {
                   { value: "unlimited", label: "Unlimited" },
                 ],
               }}
-              value={settings.library_history.max_history_entries}
+              value={preferences.library_history.max_history_entries}
               onChange={(value) =>
-                updateSetting({
+                updatePreferences({
                   section: "library_history",
                   key: "max_history_entries",
                   value,
@@ -84,9 +84,9 @@ export default function LibraryHistory() {
                 description: "Display recently read manga on the home page.",
                 type: "switch",
               }}
-              value={settings.library_history.show_recently_read}
+              value={preferences.library_history.show_recently_read}
               onChange={(value) =>
-                updateSetting({
+                updatePreferences({
                   section: "library_history",
                   key: "show_recently_read",
                   value,
@@ -111,9 +111,9 @@ export default function LibraryHistory() {
                   { value: "compact", label: "Compact" },
                 ],
               }}
-              value={settings.library_history.default_library_view}
+              value={preferences.library_history.default_library_view}
               onChange={(value) =>
-                updateSetting({
+                updatePreferences({
                   section: "library_history",
                   key: "default_library_view",
                   value,

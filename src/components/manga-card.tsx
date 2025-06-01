@@ -3,81 +3,19 @@ import { Link } from "react-router";
 import { useCoverStyle } from "@/hooks/settings/use-cover-style";
 import { useShowTitles } from "@/hooks/settings/use-show-titles";
 import { coverVariants, viewMoreVariants } from "@/lib/cover-variants";
-import {
-  ContextMenu,
-  ContextMenuCheckboxItem,
-  ContextMenuContent,
-  ContextMenuLabel,
-  ContextMenuRadioGroup,
-  ContextMenuRadioItem,
-  ContextMenuSeparator,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
 import { cn } from "@/lib/utils";
-
-interface CardContextMenuProps {
-  identifier?: string;
-  children?: React.ReactNode;
-}
-
-export function CardContextMenu({ children }: CardContextMenuProps) {
-  const { coverStyle, setCoverStyle } = useCoverStyle();
-  const { showTitles, setShowTitles } = useShowTitles();
-
-  return (
-    <ContextMenu>
-      <ContextMenuTrigger className="h-full w-full">
-        {children}
-      </ContextMenuTrigger>
-      <ContextMenuContent>
-        <ContextMenuLabel>Settings</ContextMenuLabel>
-        <ContextMenuSeparator />
-        <ContextMenuCheckboxItem
-          checked={showTitles}
-          onCheckedChange={setShowTitles}
-        >
-          Show Titles
-        </ContextMenuCheckboxItem>
-        <ContextMenuCheckboxItem>Favorite</ContextMenuCheckboxItem>
-        <ContextMenuSub>
-          <ContextMenuSubTrigger>Cover Style</ContextMenuSubTrigger>
-          <ContextMenuSubContent>
-            <ContextMenuRadioGroup
-              value={coverStyle}
-              onValueChange={(value) => {
-                setCoverStyle(
-                  value as "border" | "rounded" | "square" | "shadow",
-                );
-              }}
-            >
-              <ContextMenuRadioItem value="border">Border</ContextMenuRadioItem>
-              <ContextMenuRadioItem value="rounded">
-                Rounded
-              </ContextMenuRadioItem>
-              <ContextMenuRadioItem value="square">
-                Squared
-              </ContextMenuRadioItem>
-              <ContextMenuRadioItem value="shadow">Shadow</ContextMenuRadioItem>
-            </ContextMenuRadioGroup>
-          </ContextMenuSubContent>
-        </ContextMenuSub>
-      </ContextMenuContent>
-    </ContextMenu>
-  );
-}
+import { CardContextMenu } from "./context-menus/manga-card-menu";
+import { Option } from "@/types";
 
 export function MangaCard({
   coverUrl,
   title,
-  identifier,
+  id,
   source,
 }: {
   coverUrl: string | undefined;
   title: string;
-  identifier: string;
+  id: string;
   source: string;
 }) {
   const { coverStyle } = useCoverStyle();
@@ -85,7 +23,7 @@ export function MangaCard({
 
   return (
     <CardContextMenu>
-      <Link to={`/manga/${source}/${identifier}`}>
+      <Link to={`/manga/${source}/${id}`}>
         <div>
           <img
             className={cn(coverVariants({ style: coverStyle }))}
@@ -103,7 +41,7 @@ export function MangaCard({
   );
 }
 
-export function ViewMoreCard({ source }: { source: string }) {
+export function ViewMoreCard({ source }: { source: Option<string> }) {
   const { coverStyle } = useCoverStyle();
 
   return (

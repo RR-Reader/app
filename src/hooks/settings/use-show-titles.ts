@@ -1,12 +1,12 @@
-import { useSettings } from "@/hooks/settings/use-settings";
+import { usePreferences } from "@/hooks/settings/use-settings";
 
 export function useShowTitles() {
-  const { settings, updateSetting } = useSettings();
+  const { preferences, updatePreferences } = usePreferences();
 
-  const showTitles = settings?.layout_appearance?.show_titles ?? true;
+  const showTitles = preferences?.layout_appearance?.show_titles ?? true;
 
   const setShowTitles = (value: boolean) => {
-    updateSetting({
+    updatePreferences({
       section: "layout_appearance",
       key: "show_titles",
       value,

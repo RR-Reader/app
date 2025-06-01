@@ -1,12 +1,14 @@
+type Option<T> = T | undefined;
+
 interface MangaEntry {
+  id: string;
   source: string;
-  identifier: string;
   title: string;
   cover_url?: string;
 }
 
 interface Manga {
-  identifier: string;
+  id: string;
   title: string;
   artists: string[];
   authors: string[];
@@ -17,8 +19,8 @@ interface Manga {
 }
 
 interface ChapterEntry {
+  id: string;
   title: string;
-  url: string;
   released_since: string;
 }
 
@@ -58,4 +60,5 @@ export type {
   ExploreSection,
   Library,
   Category,
+  Option,
 };

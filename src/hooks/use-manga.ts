@@ -1,17 +1,22 @@
 import { Manga } from "@/types";
+import { mangaAPI } from "@/api/manga";
 import { useQuery } from "@tanstack/react-query";
-import { invoke } from "@tauri-apps/api/core";
+
+const QUERY_KEYS = {
+  MANGA_DETAILS: ["manga_details"] as const,
+  MANGA: (id: string, source: string) => ["manga_details", source, id] as const,
+};
 
 const useQueryMangaInfo = (
-  identifier: string | undefined,
+  id: string | undefined,
   source: string | undefined,
 ) =>
   useQuery<Manga>({
-    queryKey: ["manga_details", source, identifier],
-    queryFn: () => invoke<Manga>("load_source_chapter", { identifier, source }),
+    queryKey: ["manga_details", source, id],
+    queryFn: () => mangaAPI.getMangaDetails(id, source),
     refetchOnWindowFocus: false,
     retry: 1,
-    enabled: !!identifier && !!source,
+    enabled: !!id && !!source,
   });
 
 const MANGA_HOOKS = {

@@ -9,6 +9,7 @@ import {
   SidebarGroupLabel,
   SidebarGroupContent,
   SidebarHeader as ShadSidebarHeader,
+  useSidebar,
 } from "./ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useLocation } from "react-router";
@@ -23,8 +24,10 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import React from "react";
 
 function SidebarHeader() {
+  const { open } = useSidebar();
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -39,50 +42,61 @@ function SidebarHeader() {
 
   return (
     <ShadSidebarHeader
-      className={cn("flex-row justify-between px-4 transition-all")}
+      className={cn(
+        "flex-row justify-between px-4 transition-all",
+        !open && "justify-center",
+      )}
     >
-      <h1 className="text-2xl font-bold">RReader</h1>
-      <div className="space-x-2">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hover:bg-accent size-8"
-              onClick={handleBack}
-              aria-label="Go back"
-            >
-              <ChevronLeft className="size-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="right">
-            <p>Go back</p>
-          </TooltipContent>
-        </Tooltip>
+      {open && (
+        <>
+          <h1 className="text-2xl font-bold">RReader</h1>
+          <div className="space-x-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-accent size-8"
+                  onClick={handleBack}
+                  aria-label="Go back"
+                >
+                  <ChevronLeft className="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Go back</p>
+              </TooltipContent>
+            </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hover:bg-accent size-8"
-              onClick={handleForward}
-              aria-label="Go forward"
-            >
-              <ChevronRight className="size-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="right">
-            <p>Go forward</p>
-          </TooltipContent>
-        </Tooltip>
-      </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-accent size-8"
+                  onClick={handleForward}
+                  aria-label="Go forward"
+                >
+                  <ChevronRight className="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Go forward</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </>
+      )}
+      {!open && <h1 className="text-2xl font-bold">RR</h1>}
     </ShadSidebarHeader>
   );
 }
 
-export function Sidebar() {
+export function Sidebar({
+  ...props
+}: React.ComponentProps<typeof ShadSidebar>) {
   const { pathname } = useLocation();
+  const { setOpen } = useSidebar();
   type SidebarPath = {
     title: string;
     items: { name: string; path: string; icon?: LucideIcon }[];
@@ -137,12 +151,20 @@ export function Sidebar() {
     main: navigationLinks,
   };
 
+  React.useEffect(() => {
+    if (pathname.includes("/chapter")) {
+      setOpen(false);
+    } else {
+      setOpen(true);
+    }
+  }, [pathname, setOpen]);
+
   return (
-    <ShadSidebar collapsible="icon">
+    <ShadSidebar collapsible="icon" {...props}>
       <SidebarHeader />
       <SidebarContent>
         {data.main.map((item) => (
-          <SidebarGroup>
+          <SidebarGroup key={item.title}>
             <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
             <SidebarGroupContent>
               {item.items.map((link) => (

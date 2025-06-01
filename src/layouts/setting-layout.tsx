@@ -43,7 +43,7 @@ const settingsNavigation = [
   },
 ];
 
-export default function Settings() {
+export default function SettingsLayout() {
   const location = useLocation();
 
   return (

@@ -44,7 +44,7 @@ export const viewMoreVariants = cva(
         rounded: "rounded-lg",
         square: "rounded-none",
         border: "rounded-lg border-2 border-dashed border",
-        shadow: "rounded-lg shadow-lg hover:shadow-xl",
+        shadow: "rounded-lg shadow-lg hover:shadow-2xl",
       },
     },
     defaultVariants: {

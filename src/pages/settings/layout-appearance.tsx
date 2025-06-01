@@ -1,15 +1,15 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { SettingItem } from "@/components/settings/settings-item";
 import { SettingRenderer } from "@/components/settings/settings-renderer";
-import { useSettings } from "@/hooks/settings/use-settings";
+import { usePreferences } from "@/hooks/settings/use-settings";
 import { Paintbrush } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 
 export default function LayoutAppearance() {
-  const { settings, updateSetting } = useSettings();
+  const { preferences, updatePreferences } = usePreferences();
   const { setTheme, theme } = useTheme();
 
-  if (!settings) return <div>Loading...</div>;
+  if (!preferences) return <div>Loading...</div>;
 
   const handleThemeChange = (value: string) => {
     console.log("Theme change requested:", value);
@@ -48,10 +48,10 @@ export default function LayoutAppearance() {
                   { value: "16", label: "16" },
                 ],
               }}
-              value={settings.layout_appearance.grid_size}
+              value={preferences.layout_appearance.grid_size}
               onChange={(value) => {
                 const num = Number(value);
-                updateSetting({
+                updatePreferences({
                   section: "layout_appearance",
                   key: "grid_size",
                   value: num,
@@ -98,9 +98,9 @@ export default function LayoutAppearance() {
                   { value: "shadow", label: "Shadow" },
                 ],
               }}
-              value={settings.layout_appearance.cover_style}
+              value={preferences.layout_appearance.cover_style}
               onChange={(value) =>
-                updateSetting({
+                updatePreferences({
                   section: "layout_appearance",
                   key: "cover_style",
                   value,
@@ -120,9 +120,9 @@ export default function LayoutAppearance() {
                 description: "Display manga titles below cover images.",
                 type: "switch",
               }}
-              value={settings.layout_appearance.show_titles}
+              value={preferences.layout_appearance.show_titles}
               onChange={(value) =>
-                updateSetting({
+                updatePreferences({
                   section: "layout_appearance",
                   key: "show_titles",
                   value,
@@ -143,9 +143,9 @@ export default function LayoutAppearance() {
                   "Use smaller margins and fonts for a denser layout.",
                 type: "switch",
               }}
-              value={settings.layout_appearance.compact_mode}
+              value={preferences.layout_appearance.compact_mode}
               onChange={(value) =>
-                updateSetting({
+                updatePreferences({
                   section: "layout_appearance",
                   key: "compact_mode",
                   value,
@@ -166,9 +166,9 @@ export default function LayoutAppearance() {
                   "Display visual indicators for read and unread manga.",
                 type: "switch",
               }}
-              value={settings.layout_appearance.show_read_indicators}
+              value={preferences.layout_appearance.show_read_indicators}
               onChange={(value) =>
-                updateSetting({
+                updatePreferences({
                   section: "layout_appearance",
                   key: "show_read_indicators",
                   value,

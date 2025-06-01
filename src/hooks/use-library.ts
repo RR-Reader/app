@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { libraryAPI } from "@/types/api/library";
+import { libraryAPI } from "@/api/library";
 import { slugify } from "@/lib/utils";
 import { Library, MangaEntry, Category } from "@/types";
 
@@ -7,10 +7,10 @@ const QUERY_KEYS = {
   LIBRARY: ["library"] as const,
   CATEGORY: (slug: string) => ["category", slug] as const,
   ALL_CATEGORIES: ["categories"] as const,
-  MANGA_IN_LIBRARY: (identifier: string, source: string) =>
-    ["manga-in-library", identifier, source] as const,
-  MANGA_CATEGORY: (identifier: string, source: string) =>
-    ["manga-category", identifier, source] as const,
+  MANGA_IN_LIBRARY: (id: string, source: string) =>
+    ["manga-in-library", id, source] as const,
+  MANGA_CATEGORY: (id: string, source: string) =>
+    ["manga-category", id, source] as const,
 } as const;
 
 // Query Hooks
@@ -20,7 +20,7 @@ const useLoadLibrary = () =>
     queryFn: libraryAPI.loadLibrary,
     refetchOnWindowFocus: true,
     retry: 2,
-    staleTime: 1000 * 60 * 5, 
+    staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 10,
   });
 
@@ -36,24 +36,18 @@ const useFetchCategory = (slug: string | undefined) =>
 
 const useIsMangaInLibrary = (mangaEntry: MangaEntry) =>
   useQuery({
-    queryKey: QUERY_KEYS.MANGA_IN_LIBRARY(
-      mangaEntry.identifier,
-      mangaEntry.source,
-    ),
+    queryKey: QUERY_KEYS.MANGA_IN_LIBRARY(mangaEntry.id, mangaEntry.source),
     queryFn: () => libraryAPI.isMangaInLibrary(mangaEntry),
-    enabled: !!(mangaEntry.identifier && mangaEntry.source),
-    staleTime: 1000 * 60 * 2, 
+    enabled: !!(mangaEntry.id && mangaEntry.source),
+    staleTime: 1000 * 60 * 2,
   });
 
 const useFindMangaCategory = (mangaEntry: MangaEntry) =>
   useQuery({
-    queryKey: QUERY_KEYS.MANGA_CATEGORY(
-      mangaEntry.identifier,
-      mangaEntry.source,
-    ),
+    queryKey: QUERY_KEYS.MANGA_CATEGORY(mangaEntry.id, mangaEntry.source),
     queryFn: () => libraryAPI.findCategoryForManga(mangaEntry),
-    enabled: !!(mangaEntry.identifier && mangaEntry.source),
-    staleTime: 1000 * 60 * 2, 
+    enabled: !!(mangaEntry.id && mangaEntry.source),
+    staleTime: 1000 * 60 * 2,
   });
 
 // Mutation Hooks
@@ -258,7 +252,7 @@ const useAddMangaToCategory = () => {
             if (cat.title === categoryName || cat.title === "All Titles") {
               const entryExists = cat.entries.some(
                 (entry) =>
-                  entry.identifier === mangaEntry.identifier &&
+                  entry.id === mangaEntry.id &&
                   entry.source === mangaEntry.source,
               );
 
@@ -278,13 +272,13 @@ const useAddMangaToCategory = () => {
 
       // Update manga-in-library cache
       queryClient.setQueryData(
-        QUERY_KEYS.MANGA_IN_LIBRARY(mangaEntry.identifier, mangaEntry.source),
+        QUERY_KEYS.MANGA_IN_LIBRARY(mangaEntry.id, mangaEntry.source),
         true,
       );
 
       // Update manga category cache
       queryClient.setQueryData(
-        QUERY_KEYS.MANGA_CATEGORY(mangaEntry.identifier, mangaEntry.source),
+        QUERY_KEYS.MANGA_CATEGORY(mangaEntry.id, mangaEntry.source),
         categoryName,
       );
 
@@ -299,13 +293,13 @@ const useAddMangaToCategory = () => {
 
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.MANGA_IN_LIBRARY(
-          variables.mangaEntry.identifier,
+          variables.mangaEntry.id,
           variables.mangaEntry.source,
         ),
       });
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.MANGA_CATEGORY(
-          variables.mangaEntry.identifier,
+          variables.mangaEntry.id,
           variables.mangaEntry.source,
         ),
       });

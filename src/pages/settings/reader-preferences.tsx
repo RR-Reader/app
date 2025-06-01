@@ -1,13 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { SettingItem } from "@/components/settings/settings-item";
 import { SettingRenderer } from "@/components/settings/settings-renderer";
-import { useSettings } from "@/hooks/settings/use-settings";
+import { usePreferences } from "@/hooks/settings/use-settings";
 import { BookOpen } from "lucide-react";
+import { Stepper } from "@/components/stepper";
 
 export default function ReaderPreferences() {
-  const { settings, updateSetting } = useSettings();
+  const { preferences, updatePreferences } = usePreferences();
 
-  if (!settings) return <div>Loading...</div>;
+  if (!preferences) return <div>Loading...</div>;
 
   return (
     <div className="max-w-2xl">
@@ -39,10 +40,10 @@ export default function ReaderPreferences() {
                   { value: "vertical-scroll", label: "Vertical scroll" },
                 ],
               }}
-              value={settings.reader_preferences.page_layout}
+              value={preferences.reader_display.page_layout}
               onChange={(value) =>
-                updateSetting({
-                  section: "reader_preferences",
+                updatePreferences({
+                  section: "reader_display",
                   key: "page_layout",
                   value,
                 })
@@ -66,16 +67,22 @@ export default function ReaderPreferences() {
                   { value: "manual", label: "Manual" },
                 ],
               }}
-              value={settings.reader_preferences.zoom_behavior}
+              value={preferences.reader_display.zoom_behavior}
               onChange={(value) =>
-                updateSetting({
-                  section: "reader_preferences",
+                updatePreferences({
+                  section: "reader_display",
                   key: "zoom_behavior",
                   value,
                 })
               }
             />
           </SettingItem>
+
+          {preferences.reader_display.zoom_behavior === "manual" && (
+            <SettingItem title="Zoom Level" description="Adjust zoom level">
+              <Stepper />
+            </SettingItem>
+          )}
 
           <SettingItem
             title="Default Reading Direction"
@@ -93,10 +100,10 @@ export default function ReaderPreferences() {
                   { value: "rtl", label: "Right-to-left" },
                 ],
               }}
-              value={settings.reader_preferences.reading_direction}
+              value={preferences.reader_display.reading_direction}
               onChange={(value) =>
-                updateSetting({
-                  section: "reader_preferences",
+                updatePreferences({
+                  section: "reader_display",
                   key: "reading_direction",
                   value,
                 })
@@ -115,10 +122,10 @@ export default function ReaderPreferences() {
                 description: "Save zoom level between reading sessions.",
                 type: "switch",
               }}
-              value={settings.reader_preferences.remember_zoom}
+              value={preferences.reader_display.remember_zoom}
               onChange={(value) =>
-                updateSetting({
-                  section: "reader_preferences",
+                updatePreferences({
+                  section: "reader_display",
                   key: "remember_zoom",
                   value,
                 })
@@ -137,10 +144,10 @@ export default function ReaderPreferences() {
                 description: "Display current page number in the reader.",
                 type: "switch",
               }}
-              value={settings.reader_preferences.show_page_numbers}
+              value={preferences.reader_display.show_page_numbers}
               onChange={(value) =>
-                updateSetting({
-                  section: "reader_preferences",
+                updatePreferences({
+                  section: "reader_display",
                   key: "show_page_numbers",
                   value,
                 })
@@ -165,10 +172,10 @@ export default function ReaderPreferences() {
                   { value: "custom", label: "Custom" },
                 ],
               }}
-              value={settings.reader_preferences.background_color}
+              value={preferences.reader_display.background_color}
               onChange={(value) =>
-                updateSetting({
-                  section: "reader_preferences",
+                updatePreferences({
+                  section: "reader_display",
                   key: "background_color",
                   value,
                 })
@@ -188,10 +195,10 @@ export default function ReaderPreferences() {
                   "Load next chapter in background for faster navigation.",
                 type: "switch",
               }}
-              value={settings.reader_preferences.preload_next}
+              value={preferences.reader_display.preload_next}
               onChange={(value) =>
-                updateSetting({
-                  section: "reader_preferences",
+                updatePreferences({
+                  section: "reader_display",
                   key: "preload_next",
                   value,
                 })
