@@ -80,7 +80,7 @@ export default function ReaderPreferences() {
 
           {preferences.reader_display.zoom_behavior === "manual" && (
             <SettingItem title="Zoom Level" description="Adjust zoom level">
-              <Stepper />
+              <Stepper max={15} />
             </SettingItem>
           )}
 

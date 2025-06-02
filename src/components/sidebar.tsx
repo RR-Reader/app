@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router";
 import {
-  Sidebar as ShadSidebar,
+  Sidebar,
   SidebarContent,
   SidebarMenuButton,
   SidebarMenu,
@@ -92,9 +92,7 @@ function SidebarHeader() {
   );
 }
 
-export function Sidebar({
-  ...props
-}: React.ComponentProps<typeof ShadSidebar>) {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { pathname } = useLocation();
   const { setOpen } = useSidebar();
   type SidebarPath = {
@@ -151,16 +149,8 @@ export function Sidebar({
     main: navigationLinks,
   };
 
-  React.useEffect(() => {
-    if (pathname.includes("/chapter")) {
-      setOpen(false);
-    } else {
-      setOpen(true);
-    }
-  }, [pathname, setOpen]);
-
   return (
-    <ShadSidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader />
       <SidebarContent>
         {data.main.map((item) => (
@@ -190,6 +180,6 @@ export function Sidebar({
           </SidebarGroup>
         ))}
       </SidebarContent>
-    </ShadSidebar>
+    </Sidebar>
   );
 }

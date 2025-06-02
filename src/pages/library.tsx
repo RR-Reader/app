@@ -17,7 +17,7 @@ import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Header } from "@/components/header";
 
 function CreateCategoryDialog({ children }: { children: React.ReactNode }) {
   const { mutate: createCategory } = LIBRARY_HOOKS.useCreateCategory();
@@ -90,9 +90,7 @@ export default function Library() {
 
   return (
     <>
-      <header className="bg-sidebar border-b-sidebar-border flex border-b px-4 py-2 md:hidden">
-        <SidebarTrigger className="size-8" variant="outline" />
-      </header>
+      <Header />
       <div
         className={cn(
           "grid h-full auto-rows-min gap-4 p-4",

@@ -9,6 +9,7 @@ import {
   Settings as SettingsIcon,
   FlaskRound,
 } from "lucide-react";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 const settingsNavigation = [
   {
@@ -50,7 +51,10 @@ export default function SettingsLayout() {
     <div className="flex h-full">
       {/* Settings Navigation Sidebar */}
       <div className="bg-muted/10 w-64 border-r p-4">
-        <h1 className="mb-6 text-2xl font-bold">Settings</h1>
+        <div className="inline-flex">
+          <SidebarTrigger className="block md:hidden" />
+          <h1 className="mb-6 text-2xl font-bold">Settings</h1>
+        </div>
         <nav className="space-y-2">
           {settingsNavigation.map((item) => {
             const Icon = item.icon;

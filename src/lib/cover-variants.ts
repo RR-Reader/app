@@ -2,7 +2,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
 export const coverVariants = cva(
-  "aspect-[3/4] object-cover transition-all duration-200",
+  "aspect-[3/4] shrink-0 min-w-0 object-cover transition-all duration-200",
   {
     variants: {
       style: {

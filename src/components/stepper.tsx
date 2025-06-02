@@ -9,7 +9,7 @@ interface StepperProps {
   max?: number;
 }
 
-export function Stepper({ value, onChange, min, max }: StepperProps) {
+export function Stepper({ value, onChange, min = 0, max }: StepperProps) {
   const isControlled = value !== undefined;
   const [internalValue, setInternalValue] = React.useState(value ?? 0);
   const currentValue = isControlled ? value! : internalValue;
@@ -30,6 +30,7 @@ export function Stepper({ value, onChange, min, max }: StepperProps) {
         onClick={() => setValueSafely(currentValue - 1)}
         aria-label="Decrease value"
         variant="outline"
+        disabled={currentValue <= (min ?? -Infinity)}
       >
         <Minus />
       </Button>
@@ -46,6 +47,7 @@ export function Stepper({ value, onChange, min, max }: StepperProps) {
         size="icon"
         className="size-8"
         onClick={() => setValueSafely(currentValue + 1)}
+        disabled={currentValue >= (max ?? Infinity)}
         aria-label="Increase value"
         variant="outline"
       >

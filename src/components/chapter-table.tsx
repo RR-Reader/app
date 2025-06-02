@@ -150,7 +150,7 @@ function ChapterRow({ row }: { row: Row<ChapterEntry> }) {
 }
 
 export function ChapterTable({ data: initialData }: { data: ChapterEntry[] }) {
-  const [inverted, setInverted] = React.useState(true);
+  const [inverted, setInverted] = React.useState(false);
   const data = React.useMemo(() => {
     return inverted ? [...initialData].reverse() : initialData;
   }, [initialData, inverted]);
