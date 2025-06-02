@@ -2,7 +2,7 @@ use crate::settings::get_preferences_path;
 use serde::{Deserialize, Serialize};
 use serde_json::{from_str, to_string_pretty};
 use std::fs;
-use tauri::AppHandle;
+use tauri::{command, AppHandle};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AppPreferences {
@@ -356,12 +356,12 @@ impl AppPreferences {
     }
 }
 
-#[tauri::command]
+#[command]
 pub fn load_preferences(app_handle: AppHandle) -> Result<AppPreferences, String> {
     AppPreferences::load(&app_handle)
 }
 
-#[tauri::command]
+#[command]
 pub fn update_preference(
     section: String,
     key: String,
@@ -372,13 +372,13 @@ pub fn update_preference(
     preferences.update_preference(&section, &key, value, &app_handle)
 }
 
-#[tauri::command]
+#[command]
 pub fn reset_preferences(app_handle: AppHandle) -> Result<(), String> {
     let default_preferences = AppPreferences::default();
     default_preferences.save(&app_handle)
 }
 
-#[tauri::command]
+#[command]
 pub fn get_preference_section(
     section: String,
     app_handle: AppHandle,

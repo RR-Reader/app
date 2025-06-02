@@ -1,6 +1,5 @@
-use crate::EntryCache;
 use std::{fs, path::PathBuf};
-use tauri::{command, AppHandle, Manager, State};
+use tauri::{AppHandle, Manager};
 
 pub fn get_app_data_dir(app_handle: &AppHandle) -> Result<PathBuf, String> {
     let app_data_dir = app_handle
@@ -34,27 +33,4 @@ pub fn get_preferences_path(app_handle: &AppHandle) -> Result<PathBuf, String> {
 
 pub fn get_library_path(app_handle: &AppHandle) -> Result<PathBuf, String> {
     Ok(get_app_data_dir(app_handle)?.join("library.json"))
-}
-
-// Commands
-
-#[command]
-pub async fn clean_manga_cache(cache: State<'_, EntryCache>) -> Result<(), String> {
-    cache.invalidate_all();
-    Ok(())
-}
-
-#[command]
-pub async fn get_cache_stats(cache: State<'_, EntryCache>) -> Result<(u64, u64), String> {
-    Ok((cache.entry_count(), cache.weighted_size()))
-}
-
-#[command]
-pub fn get_app_data_directory(app_handle: AppHandle) -> Result<String, String> {
-    get_app_data_dir(&app_handle).map(|path| path.to_string_lossy().to_string())
-}
-
-#[command]
-pub fn get_manga_images_directory(app_handle: AppHandle) -> Result<String, String> {
-    get_manga_images_dir(&app_handle).map(|path| path.to_string_lossy().to_string())
 }
