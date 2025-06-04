@@ -50,12 +50,15 @@ function LoadingSkeleton({ grid }: { grid: number }) {
 
 export default function Category() {
   const { grid } = useGrid();
-  const { title } = useParams<{ title: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const { data, isLoading, error, refetch, isRefetching } =
-    LIBRARY_HOOKS.useFetchCategory(title);
+    LIBRARY_HOOKS.useFetchCategory(slug);
 
   return (
     <>
+      <header className="px-4 py-2">
+        <h1 className="text-2xl font-semibold">{data?.title}</h1>
+      </header>
       <div className="h-full overflow-hidden">
         {(isLoading || isRefetching) && <LoadingSkeleton grid={grid} />}
 

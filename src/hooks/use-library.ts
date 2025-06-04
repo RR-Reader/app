@@ -1,19 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { libraryAPI } from "@/api/library";
 import { slugify } from "@/lib/utils";
-import { Library, MangaEntry, Category } from "@/types";
+import { Library, MangaEntry, Category, CategoryMeta } from "@/types";
 
 const QUERY_KEYS = {
   LIBRARY: ["library"] as const,
   CATEGORY: (slug: string) => ["category", slug] as const,
-  ALL_CATEGORIES: ["categories"] as const,
   MANGA_IN_LIBRARY: (id: string, source: string) =>
     ["manga-in-library", id, source] as const,
   MANGA_CATEGORY: (id: string, source: string) =>
     ["manga-category", id, source] as const,
 } as const;
 
-// Query Hooks
 const useLoadLibrary = () =>
   useQuery({
     queryKey: QUERY_KEYS.LIBRARY,
@@ -50,7 +48,6 @@ const useFindMangaCategory = (mangaEntry: MangaEntry) =>
     staleTime: 1000 * 60 * 2,
   });
 
-// Mutation Hooks
 const useCreateCategory = () => {
   const queryClient = useQueryClient();
 
@@ -59,29 +56,25 @@ const useCreateCategory = () => {
     mutationFn: ({ categoryName }: { categoryName: string }) =>
       libraryAPI.createCategory(categoryName),
     onMutate: async ({ categoryName }) => {
-      // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: QUERY_KEYS.LIBRARY });
 
-      // Snapshot the previous value
       const previousLibrary = queryClient.getQueryData<Library>(
         QUERY_KEYS.LIBRARY,
       );
 
-      // Optimistically update
       queryClient.setQueryData<Library>(QUERY_KEYS.LIBRARY, (old) => {
         if (!old) return old;
 
-        const newCategory: Category = {
+        const newCategoryMeta: CategoryMeta = {
           title: categoryName,
           slug: slugify(categoryName),
-          entries: [],
           sort_by: "title",
           sort_order: "asc",
         };
 
         return {
           ...old,
-          categories: [...old.categories, newCategory],
+          categories: [...old.categories, newCategoryMeta],
         };
       });
 
@@ -89,130 +82,6 @@ const useCreateCategory = () => {
     },
     onError: (error: Error, _, context) => {
       console.error("Create category error:", error.message);
-
-      // Rollback on error
-      if (context?.previousLibrary) {
-        queryClient.setQueryData(QUERY_KEYS.LIBRARY, context.previousLibrary);
-      }
-    },
-    onSettled: () => {
-      // Always refetch after error or success
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LIBRARY });
-    },
-  });
-};
-
-const useEditCategory = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationKey: ["edit_category"],
-    mutationFn: ({ name, newName }: { name: string; newName: string }) =>
-      libraryAPI.editCategory(name, newName),
-    onMutate: async ({ name, newName }) => {
-      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.LIBRARY });
-
-      const previousLibrary = queryClient.getQueryData<Library>(
-        QUERY_KEYS.LIBRARY,
-      );
-
-      const oldSlug = slugify(name);
-      const newSlug = slugify(newName);
-
-      // Update library data
-      queryClient.setQueryData<Library>(QUERY_KEYS.LIBRARY, (old) => {
-        if (!old) return old;
-        return {
-          ...old,
-          categories: old.categories.map((cat) =>
-            cat.title === name
-              ? { ...cat, title: newName, slug: newSlug }
-              : cat,
-          ),
-        };
-      });
-
-      // Update category cache if it exists
-      const categoryData = queryClient.getQueryData(
-        QUERY_KEYS.CATEGORY(oldSlug),
-      );
-      if (categoryData) {
-        queryClient.setQueryData(QUERY_KEYS.CATEGORY(newSlug), {
-          ...categoryData,
-          title: newName,
-          slug: newSlug,
-        });
-        queryClient.removeQueries({ queryKey: QUERY_KEYS.CATEGORY(oldSlug) });
-      }
-
-      return { previousLibrary, oldSlug, newSlug };
-    },
-    onError: (error: Error, _, context) => {
-      console.error("Edit category error:", error.message);
-
-      if (context?.previousLibrary) {
-        queryClient.setQueryData(QUERY_KEYS.LIBRARY, context.previousLibrary);
-      }
-
-      // Restore old category cache if needed
-      if (context?.oldSlug && context?.newSlug) {
-        const newCategoryData = queryClient.getQueryData(
-          QUERY_KEYS.CATEGORY(context.newSlug),
-        );
-        if (newCategoryData) {
-          queryClient.setQueryData(
-            QUERY_KEYS.CATEGORY(context.oldSlug),
-            newCategoryData,
-          );
-          queryClient.removeQueries({
-            queryKey: QUERY_KEYS.CATEGORY(context.newSlug),
-          });
-        }
-      }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LIBRARY });
-    },
-  });
-};
-
-const useDeleteCategory = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationKey: ["delete_category"],
-    mutationFn: (name: string) => libraryAPI.deleteCategory(name),
-    onMutate: async (deletedName) => {
-      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.LIBRARY });
-
-      const previousLibrary = queryClient.getQueryData<Library>(
-        QUERY_KEYS.LIBRARY,
-      );
-
-      // Optimistically remove category
-      queryClient.setQueryData<Library>(QUERY_KEYS.LIBRARY, (old) => {
-        if (!old) return old;
-        return {
-          ...old,
-          categories: old.categories.filter((cat) => cat.title !== deletedName),
-        };
-      });
-
-      return { previousLibrary };
-    },
-    onSuccess: (_, deletedName) => {
-      // Remove category-specific queries
-      queryClient.removeQueries({
-        queryKey: ["category"],
-        predicate: (query) => {
-          const [, slug] = query.queryKey;
-          return slug === slugify(deletedName);
-        },
-      });
-    },
-    onError: (error: Error, _, context) => {
-      console.error("Delete category error:", error.message);
-
       if (context?.previousLibrary) {
         queryClient.setQueryData(QUERY_KEYS.LIBRARY, context.previousLibrary);
       }
@@ -238,57 +107,91 @@ const useAddMangaToCategory = () => {
     onMutate: async ({ categoryName, mangaEntry }) => {
       await queryClient.cancelQueries({ queryKey: QUERY_KEYS.LIBRARY });
 
-      const previousLibrary = queryClient.getQueryData<Library>(
-        QUERY_KEYS.LIBRARY,
-      );
-
-      // Optimistically add manga to category and "All Titles"
-      queryClient.setQueryData<Library>(QUERY_KEYS.LIBRARY, (old) => {
-        if (!old) return old;
-
-        return {
-          ...old,
-          categories: old.categories.map((cat) => {
-            if (cat.title === categoryName || cat.title === "All Titles") {
-              const entryExists = cat.entries.some(
-                (entry) =>
-                  entry.id === mangaEntry.id &&
-                  entry.source === mangaEntry.source,
-              );
-
-              if (!entryExists) {
-                const newEntries = [...cat.entries, mangaEntry];
-                // Sort by title for "All Titles" category
-                if (cat.title === "All Titles") {
-                  newEntries.sort((a, b) => a.title.localeCompare(b.title));
-                }
-                return { ...cat, entries: newEntries };
-              }
-            }
-            return cat;
-          }),
-        };
+      const categorySlug = slugify(categoryName);
+      await queryClient.cancelQueries({
+        queryKey: QUERY_KEYS.CATEGORY(categorySlug),
       });
 
-      // Update manga-in-library cache
+      const allTitlesSlug = slugify("All Titles");
+      await queryClient.cancelQueries({
+        queryKey: QUERY_KEYS.CATEGORY(allTitlesSlug),
+      });
+
+      const previousCategory = queryClient.getQueryData<Category>(
+        QUERY_KEYS.CATEGORY(categorySlug),
+      );
+      const previousAllTitles = queryClient.getQueryData<Category>(
+        QUERY_KEYS.CATEGORY(allTitlesSlug),
+      );
+
+      if (previousCategory) {
+        queryClient.setQueryData<Category>(
+          QUERY_KEYS.CATEGORY(categorySlug),
+          (old) => {
+            if (!old) return old;
+            const entryExists = old.entries.some(
+              (entry) =>
+                entry.id === mangaEntry.id &&
+                entry.source === mangaEntry.source,
+            );
+            if (!entryExists) {
+              return { ...old, entries: [...old.entries, mangaEntry] };
+            }
+            return old;
+          },
+        );
+      }
+
+      if (categoryName !== "All Titles" && previousAllTitles) {
+        queryClient.setQueryData<Category>(
+          QUERY_KEYS.CATEGORY(allTitlesSlug),
+          (old) => {
+            if (!old) return old;
+            const entryExists = old.entries.some(
+              (entry) =>
+                entry.id === mangaEntry.id &&
+                entry.source === mangaEntry.source,
+            );
+            if (!entryExists) {
+              const newEntries = [...old.entries, mangaEntry];
+              newEntries.sort((a, b) => a.title.localeCompare(b.title));
+              return { ...old, entries: newEntries };
+            }
+            return old;
+          },
+        );
+      }
+
       queryClient.setQueryData(
         QUERY_KEYS.MANGA_IN_LIBRARY(mangaEntry.id, mangaEntry.source),
         true,
       );
-
-      // Update manga category cache
       queryClient.setQueryData(
         QUERY_KEYS.MANGA_CATEGORY(mangaEntry.id, mangaEntry.source),
         categoryName,
       );
 
-      return { previousLibrary };
+      return {
+        previousCategory,
+        previousAllTitles,
+        categorySlug,
+        allTitlesSlug,
+      };
     },
     onError: (error: Error, variables, context) => {
       console.error("Add manga to category error:", error.message);
 
-      if (context?.previousLibrary) {
-        queryClient.setQueryData(QUERY_KEYS.LIBRARY, context.previousLibrary);
+      if (context?.previousCategory) {
+        queryClient.setQueryData(
+          QUERY_KEYS.CATEGORY(context.categorySlug),
+          context.previousCategory,
+        );
+      }
+      if (context?.previousAllTitles) {
+        queryClient.setQueryData(
+          QUERY_KEYS.CATEGORY(context.allTitlesSlug),
+          context.previousAllTitles,
+        );
       }
 
       queryClient.invalidateQueries({
@@ -304,8 +207,17 @@ const useAddMangaToCategory = () => {
         ),
       });
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LIBRARY });
+    onSettled: (_, __, variables) => {
+      const categorySlug = slugify(variables.categoryName);
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.CATEGORY(categorySlug),
+      });
+
+      if (variables.categoryName !== "All Titles") {
+        queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.CATEGORY(slugify("All Titles")),
+        });
+      }
     },
   });
 };
@@ -325,8 +237,18 @@ const useRemoveMangaFromCategory = () => {
       mangaSource: string;
     }) =>
       libraryAPI.removeMangaFromCategory(categoryName, mangaId, mangaSource),
-    onSuccess: (_, { mangaId, mangaSource }) => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LIBRARY });
+    onSuccess: (_, { mangaId, mangaSource, categoryName }) => {
+      const categorySlug = slugify(categoryName);
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.CATEGORY(categorySlug),
+      });
+
+      if (categoryName !== "All Titles") {
+        queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.CATEGORY(slugify("All Titles")),
+        });
+      }
+
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.MANGA_IN_LIBRARY(mangaId, mangaSource),
       });
@@ -340,7 +262,6 @@ const useRemoveMangaFromCategory = () => {
   });
 };
 
-// Compound Hooks
 const useLibraryWithCategories = () => {
   const library = useLoadLibrary();
   const categories = library.data?.categories || [];
@@ -382,25 +303,19 @@ const useCategoryWithManga = (slug: string | undefined) => {
 };
 
 const LIBRARY_HOOKS = {
-  // Query hooks
   useLoadLibrary,
   useFetchCategory,
   useIsMangaInLibrary,
   useFindMangaCategory,
 
-  // Mutation hooks
   useCreateCategory,
-  useEditCategory,
-  useDeleteCategory,
   useAddMangaToCategory,
   useRemoveMangaFromCategory,
 
-  // Compound hooks
   useLibraryWithCategories,
   useMangaInLibrary,
   useCategoryWithManga,
 
-  // Constants
   QUERY_KEYS,
 } as const;
 

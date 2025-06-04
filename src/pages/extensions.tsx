@@ -1,5 +1,8 @@
 import { Input } from "@/components/ui/input";
 import { useSearchParams } from "react-router";
+import { useFetchSourceList } from "@/hooks/use-source-list";
+import { open } from "@tauri-apps/plugin-shell";
+
 import {
   Select,
   SelectContent,
@@ -7,9 +10,6 @@ import {
   SelectValue,
   SelectTrigger,
 } from "@/components/ui/select";
-import { useFetchSourceList } from "@/hooks/use-source-list";
-import { open } from "@tauri-apps/plugin-shell";
-
 import {
   Card,
   CardHeader,
@@ -18,66 +18,15 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { RefreshCcw } from "lucide-react";
-
-import type { SourceEntry } from "@/types";
-import React from "react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
+import React from "react";
 import { cn } from "@/lib/utils";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
-
-const randomObject: SourceEntry[] = [
-  {
-    id: "1",
-    name: "Extension One",
-    description: "This is the first extension.",
-    version: "1.0",
-    icon_url: "",
-    source_url: "",
-    download_url: "",
-    tags: ["tag1", "tag2"],
-    language: "English",
-    content_rating: "Everyone",
-  },
-  {
-    id: "2",
-    name: "Extension Two",
-    description: "This is the second extension.",
-    version: "1.0",
-    icon_url: "",
-    source_url: "",
-    download_url: "",
-    tags: ["tag3", "tag4"],
-    language: "Spanish",
-    content_rating: "Everyone",
-  },
-  {
-    id: "3",
-    name: "Extension Three",
-    description: "This is the third extension.",
-    version: "1.0",
-    icon_url: "",
-    source_url: "",
-    download_url: "",
-    tags: ["tag5", "tag6"],
-    language: "French",
-    content_rating: "Everyone",
-  },
-  {
-    id: "4",
-    name: "Extension Four",
-    description: "This is the fourth extension.",
-    version: "1.0",
-    icon_url: "",
-    source_url: "",
-    download_url: "",
-    tags: ["tag7", "tag8"],
-    language: "French",
-    content_rating: "Everyone",
-  },
-];
+import { RefreshCcw } from "lucide-react";
 
 type SearchOptions =
   | "name"
@@ -162,17 +111,23 @@ export default function Extensions() {
         {filteredExtensions.map((entry) => (
           <Card key={entry.id}>
             <CardHeader>
-              <CardTitle>{entry.name}</CardTitle>
+              <div className="flex items-center justify-between">
+                <div className="inline-flex items-center gap-2">
+                  <img src={entry.icon_url} className="size-6" />
+                  <CardTitle>{entry.name}</CardTitle>
+                </div>
+                <Badge variant="outline">{entry.version}</Badge>
+              </div>
               <CardDescription>{entry.description}</CardDescription>
             </CardHeader>
             <CardContent>
+              <div className="-mt-4 mb-2 flex flex-wrap items-center gap-2">
+                {entry.tags.map((tag) => (
+                  <Badge key={tag}>{tag}</Badge>
+                ))}
+              </div>
+
               <div className="text-muted-foreground grid grid-cols-1 text-xs sm:grid-cols-2">
-                <p>
-                  <strong className="text-black dark:text-white">
-                    Version:
-                  </strong>{" "}
-                  {entry.version}
-                </p>
                 <p>
                   <strong className="text-black dark:text-white">
                     Language:
@@ -184,10 +139,6 @@ export default function Extensions() {
                     Content Rating:
                   </strong>{" "}
                   {entry.content_rating}
-                </p>
-                <p>
-                  <strong className="text-black dark:text-white">Tags:</strong>{" "}
-                  {entry.tags.join(", ")}
                 </p>
               </div>
             </CardContent>

@@ -1,19 +1,5 @@
-import { MangaCard, ViewMoreCard } from "@/components/manga-card";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import EXPLORE from "@/hooks/use-explore";
-import { useParams, useNavigate } from "react-router";
-import { useGrid } from "@/hooks/settings/use-grid";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ExploreContextMenu } from "@/components/context-menus/explore-context";
-import {
-  Carousel,
-  CarouselItem,
-  CarouselContent,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Header } from "@/components/header";
 
 function ErrorFallback({
   error,
@@ -59,133 +45,13 @@ function LoadingFallback({ grid }: { grid: number }) {
 }
 
 export default function Explore() {
-  const { grid } = useGrid();
-  const { source } = useParams<{ source: string }>();
-  const { data, isLoading, error, refetch } =
-    EXPLORE.useFetchExplorePages(source);
-
-  const navigate = useNavigate();
-
-  const handleTabChange = (value: string) => {
-    navigate(`/explore/${value}`);
-  };
-
-  console.log("data", data);
+  const error = null;
+  const isLoading = false;
 
   return (
-    <ExploreContextMenu>
-      <Tabs value={source} className="flex min-h-screen flex-col gap-0">
-        <Header />
-        <TabsList className="bg-muted mt-0 w-full justify-start">
-          <TabsTrigger
-            className="max-w-fit cursor-pointer px-4"
-            onClick={() => handleTabChange("")}
-            value=""
-          >
-            Home
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent
-          value=""
-          className="flex h-full w-full items-center justify-center text-center"
-        >
-          <h1 className="text-5xl font-semibold">No source selected</h1>
-        </TabsContent>
-
-        {isLoading && <LoadingFallback grid={grid} />}
-        {error && <ErrorFallback error={error} onRetry={() => refetch()} />}
-
-        {data?.map((page) => (
-          <TabsContent value={page.source} className="relative">
-            {page.sections.map((section) => (
-              <>
-                <h1 className="my-4 ml-14 text-3xl font-semibold">
-                  {section.title}
-                </h1>
-                <Carousel
-                  opts={{ align: "start" }}
-                  className="max-w-full overflow-x-hidden"
-                >
-                  <CarouselContent className="mx-12">
-                    {section.entries.map((entry) => (
-                      <CarouselItem
-                        key={entry.id}
-                        className={cn(
-                          grid === 6 && "basis-1/6",
-                          grid === 8 && "basis-1/8",
-                          grid === 12 && "basis-1/12",
-                          grid === 16 && "basis-1/16",
-                        )}
-                      >
-                        <MangaCard
-                          source={entry.source}
-                          id={entry.id}
-                          title={entry.title}
-                          coverUrl={entry.cover_url}
-                          size={grid}
-                        />
-                      </CarouselItem>
-                    ))}
-                    <CarouselItem
-                      className={cn(
-                        grid === 6 && "basis-1/6",
-                        grid === 8 && "basis-1/8",
-                        grid === 12 && "basis-1/12",
-                        grid === 16 && "basis-1/16",
-                      )}
-                    >
-                      <ViewMoreCard source={"batoto"} />
-                    </CarouselItem>
-                  </CarouselContent>
-                  <CarouselPrevious className="left-1 hidden md:flex" />
-                  <CarouselNext className="right-1 hidden md:flex" />
-                </Carousel>
-              </>
-            ))}
-          </TabsContent>
-        ))}
-      </Tabs>
-    </ExploreContextMenu>
+    <>
+      {error && <ErrorFallback error={error} onRetry={() => {}} />}{" "}
+      {isLoading && <LoadingFallback grid={4} />}
+    </>
   );
-}
-
-{
-  /* <>
-  <h1 className="my-4 ml-14 text-3xl font-semibold">{section.title}</h1>
-  <Carousel opts={{ align: "start" }} className="max-w-full overflow-x-hidden">
-    <CarouselContent className="mx-12">
-      {section.entries.map((entry) => (
-        <CarouselItem
-          key={entry.id}
-          className={cn(
-            grid === 6 && "basis-1/6",
-            grid === 8 && "basis-1/8",
-            grid === 12 && "basis-1/12",
-            grid === 16 && "basis-1/16",
-          )}
-        >
-          <MangaCard
-            source={entry.source}
-            id={entry.id}
-            title={entry.title}
-            coverUrl={entry.cover_url}
-            size={grid}
-          />
-        </CarouselItem>
-      ))}
-      <CarouselItem
-        className={cn(
-          grid === 6 && "basis-1/6",
-          grid === 8 && "basis-1/8",
-          grid === 12 && "basis-1/12",
-          grid === 16 && "basis-1/16",
-        )}
-      >
-        <ViewMoreCard source={"batoto"} />
-      </CarouselItem>
-    </CarouselContent>
-    <CarouselPrevious className="left-1" />
-    <CarouselNext className="right-1" />
-  </Carousel>
-</>; */
 }

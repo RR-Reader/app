@@ -1,4 +1,4 @@
-// pages/settings/Experimental.tsx
+
 import { Card, CardContent } from "@/components/ui/card";
 import { SettingItem } from "@/components/settings/settings-item";
 import { SettingRenderer } from "@/components/settings/settings-renderer";

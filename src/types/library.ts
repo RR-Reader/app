@@ -1,5 +1,12 @@
 import type { MangaEntry } from "./manga";
 
+type CategoryMeta = {
+  title: string;
+  slug: string;
+  sort_by: string;
+  sort_order: "asc" | "desc";
+};
+
 type Category = {
   title: string;
   slug: string;
@@ -9,8 +16,7 @@ type Category = {
 };
 
 type Library = {
-  categories: Category[];
-}
+  categories: CategoryMeta[];
+};
 
-
-export type { Category, Library };
+export type { Category, CategoryMeta, Library };

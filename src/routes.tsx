@@ -1,7 +1,6 @@
 import { createBrowserRouter, RouteObject } from "react-router";
 
 import Category from "./pages/category";
-import Library from "@/pages/library";
 import Explore from "./pages/explore";
 import Extensions from "./pages/extensions";
 import Search from "./pages/search";
@@ -18,6 +17,7 @@ import StorageCaching from "./pages/settings/storage-caching";
 import SystemBehavior from "./pages/settings/system-behavior";
 import LayoutAppearance from "./pages/settings/layout-appearance";
 import LibraryHistory from "./pages/settings/library-history";
+import Home from "./pages/home";
 
 const settingsRoutes: RouteObject[] = [
   {
@@ -53,7 +53,7 @@ const settingsRoutes: RouteObject[] = [
 const mainRoutes: RouteObject[] = [
   {
     index: true,
-    element: <Library />,
+    element: <Home />,
   },
   {
     path: "manga/:source/:id",
@@ -80,7 +80,7 @@ const mainRoutes: RouteObject[] = [
     element: <Search />,
   },
   {
-    path: "category/:title",
+    path: "category/:slug",
     element: <Category />,
   },
   {

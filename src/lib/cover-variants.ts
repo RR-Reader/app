@@ -1,4 +1,4 @@
-// lib/cover-variants.ts
+
 import { cva, type VariantProps } from "class-variance-authority";
 
 export const coverVariants = cva(

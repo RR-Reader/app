@@ -1,3 +1,4 @@
+mod extensions;
 mod library;
 mod preferences;
 mod settings;
@@ -17,6 +18,8 @@ pub fn run() {
             library::find_category_for_manga,
             library::is_manga_in_library,
             library::remove_manga_from_category,
+            extensions::load_manifest,
+            extensions::save_manifest,
             preferences::load_preferences,
             preferences::update_preference,
             preferences::reset_preferences,

@@ -1,4 +1,4 @@
-// pages/Settings.tsx
+
 import { Outlet, useLocation, Link } from "react-router";
 import { cn } from "@/lib/utils";
 import {
