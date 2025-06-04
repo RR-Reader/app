@@ -9,12 +9,12 @@ type PreferenceType =
   | "folder"
   | "stepper";
 
-export interface PreferenceOption {
+interface PreferenceOption {
   value: string;
   label: string;
 }
 
-export interface Preferences {
+interface Preferences {
   key: string;
   title: string;
   description?: string;
@@ -28,14 +28,14 @@ export interface Preferences {
   storeKey?: string;
 }
 
-export interface PreferencesSection {
+interface PreferencesSection {
   key: string;
   title: string;
   icon: LucideIcon;
   settings: Preferences[];
 }
 
-export interface AppPreferences {
+interface AppPreferences {
   layout_appearance: {
     grid_size: number;
     theme: string;
@@ -78,3 +78,11 @@ export interface AppPreferences {
     hardware_acceleration: boolean;
   };
 }
+
+export type {
+  PreferenceType,
+  PreferenceOption,
+  Preferences,
+  PreferencesSection,
+  AppPreferences,
+};

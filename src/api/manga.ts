@@ -1,4 +1,4 @@
-import type { Chapter, Manga, MangaEntry, Option } from "@/types/index";
+import type { Chapter, Manga, MangaEntry, Option } from "@/types";
 import { invoke } from "@tauri-apps/api/core";
 
 interface MangaAPI {

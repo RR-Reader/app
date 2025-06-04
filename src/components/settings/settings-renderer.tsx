@@ -1,4 +1,4 @@
-import { Preferences } from "@/types/preferences";
+import { Preferences } from "@/types";
 import {
   Select,
   SelectContent,

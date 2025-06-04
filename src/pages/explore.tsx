@@ -61,21 +61,10 @@ function LoadingFallback({ grid }: { grid: number }) {
 export default function Explore() {
   const { grid } = useGrid();
   const { source } = useParams<{ source: string }>();
-  const { data, isLoading, error, refetch, isRefetching } =
+  const { data, isLoading, error, refetch } =
     EXPLORE.useFetchExplorePages(source);
 
   const navigate = useNavigate();
-
-  type Source = {
-    name: string;
-    path: string;
-  };
-
-  const sourceList: Source[] = [
-    { name: "Batoto", path: "batoto" },
-    { name: "Mangadex", path: "mangadex" },
-    { name: "WeebCentral", path: "weebcentral" },
-  ];
 
   const handleTabChange = (value: string) => {
     navigate(`/explore/${value}`);
@@ -95,16 +84,6 @@ export default function Explore() {
           >
             Home
           </TabsTrigger>
-          {sourceList.map((src) => (
-            <TabsTrigger
-              key={src.path}
-              onClick={() => handleTabChange(src.path)}
-              value={src.path}
-              className="max-w-fit cursor-pointer px-4"
-            >
-              {src.name}
-            </TabsTrigger>
-          ))}
         </TabsList>
         <TabsContent
           value=""
@@ -112,6 +91,9 @@ export default function Explore() {
         >
           <h1 className="text-5xl font-semibold">No source selected</h1>
         </TabsContent>
+
+        {isLoading && <LoadingFallback grid={grid} />}
+        {error && <ErrorFallback error={error} onRetry={() => refetch()} />}
 
         {data?.map((page) => (
           <TabsContent value={page.source} className="relative">

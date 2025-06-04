@@ -12,7 +12,7 @@ const useQueryMangaInfo = (
   source: string | undefined,
 ) =>
   useQuery<Manga>({
-    queryKey: ["manga_details", source, id],
+    queryKey: QUERY_KEYS.MANGA(id!, source!),
     queryFn: () => mangaAPI.getMangaDetails(id, source),
     refetchOnWindowFocus: false,
     retry: 1,

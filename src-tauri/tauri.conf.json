@@ -18,7 +18,15 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": null,
+      "capabilities": [
+        {
+          "identifier": "main-capability",
+          "description": "Main window capability",
+          "windows": ["main"],
+          "permissions": ["core:default", "opener:default", "shell:default"]
+        }
+      ]
     }
   },
   "bundle": {

@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { useLocation } from "react-router";
 import {
   type LucideIcon,
+  Package,
   Search,
   Compass,
   LibraryBig,
@@ -94,7 +95,6 @@ function SidebarHeader() {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { pathname } = useLocation();
-  const { setOpen } = useSidebar();
   type SidebarPath = {
     title: string;
     items: { name: string; path: string; icon?: LucideIcon }[];
@@ -134,6 +134,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           name: "Explore",
           path: "/explore",
           icon: Compass,
+        },
+        {
+          name: "Extensions",
+          path: "/extensions",
+          icon: Package,
         },
         {
           name: "Settings",

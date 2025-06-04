@@ -3,6 +3,7 @@ import { createBrowserRouter, RouteObject } from "react-router";
 import Category from "./pages/category";
 import Library from "@/pages/library";
 import Explore from "./pages/explore";
+import Extensions from "./pages/extensions";
 import Search from "./pages/search";
 
 import BaseLayout from "@/layouts/base-layout";
@@ -61,6 +62,10 @@ const mainRoutes: RouteObject[] = [
   {
     path: "manga/:source/:id/chapter/:chapterId",
     element: <Reader />,
+  },
+  {
+    path: "extensions/",
+    element: <Extensions />,
   },
   {
     path: "explore",

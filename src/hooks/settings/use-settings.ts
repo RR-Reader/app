@@ -1,7 +1,7 @@
 // hooks/useSettings.ts
 import { invoke } from "@tauri-apps/api/core";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { AppPreferences } from "@/types/preferences";
+import { AppPreferences } from "@/types";
 
 export function usePreferences() {
   const queryClient = useQueryClient();

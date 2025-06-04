@@ -6,7 +6,6 @@ import { coverVariants, viewMoreVariants } from "@/lib/cover-variants";
 import { cn } from "@/lib/utils";
 import { CardContextMenu } from "./context-menus/manga-card-menu";
 import { Option } from "@/types";
-import { useGrid } from "@/hooks/settings/use-grid";
 import { VariantProps } from "class-variance-authority";
 
 type MangaCardProps = {

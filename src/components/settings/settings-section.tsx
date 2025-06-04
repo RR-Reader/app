@@ -1,4 +1,4 @@
-import type { PreferencesSection } from "@/types/preferences";
+import type { PreferencesSection } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { useState } from "react";
 import { SettingRenderer } from "./settings-renderer";
