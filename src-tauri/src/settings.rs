@@ -1,8 +1,8 @@
-use std::{
-    fs::{self, File},
-    path::PathBuf,
-};
+use serde_json::to_string_pretty;
+use std::{fs, path::PathBuf};
 use tauri::{AppHandle, Manager};
+
+use crate::extensions::ExtensionManager;
 
 pub fn get_app_data_dir(app_handle: &AppHandle) -> Result<PathBuf, String> {
     let app_data_dir = app_handle
@@ -32,20 +32,28 @@ pub fn get_cache_dir(app_handle: &AppHandle) -> Result<PathBuf, String> {
     Ok(cache_dir)
 }
 
-#[allow(dead_code)]
-pub fn get_extensions_dir(app_handle: &AppHandle) -> Result<PathBuf, String> {
+pub fn get_extensions_path(app_handle: &AppHandle) -> Result<PathBuf, String> {
     let extensions_dir = get_app_data_dir(app_handle)?.join("extensions");
     fs::create_dir_all(&extensions_dir)
         .map_err(|e| format!("Failed to create extensions directory: {}", e))?;
     Ok(extensions_dir)
 }
 
-#[allow(dead_code)]
 pub fn get_extensions_manifest_path(app_handle: &AppHandle) -> Result<PathBuf, String> {
-    let path = get_extensions_dir(app_handle)?.join("extensions.json");
+    let path = get_extensions_path(app_handle)?.join("manifest.json");
 
     if !path.exists() {
-        File::create(&path).map_err(|e| format!("Failed to create extensions.json: {}", e))?;
+        if let Some(parent) = path.parent() {
+            fs::create_dir_all(parent)
+                .map_err(|e| format!("Failed to create manifest directory: {}", e))?;
+        }
+
+        let default_manager = ExtensionManager::new();
+        let default_json = to_string_pretty(&default_manager)
+            .map_err(|e| format!("Failed to serialize default manifest: {}", e))?;
+
+        fs::write(&path, default_json)
+            .map_err(|e| format!("Failed to create manifest.json with default content: {}", e))?;
     }
 
     Ok(path)

@@ -68,7 +68,7 @@ impl Library {
             .map_err(|e| format!("Failed to serialize library metadata: {}", e))?;
 
         let library_path = get_library_path(app_handle)?;
-        let library_meta_path = library_path.join("library.json");
+        let library_meta_path = library_path.join("manifest.json");
 
         fs::create_dir_all(&library_path)
             .map_err(|e| format!("Failed to create library directory: {}", e))?;
@@ -79,7 +79,7 @@ impl Library {
 
     pub fn load(app_handle: &AppHandle) -> Result<Self, String> {
         let library_path = get_library_path(app_handle)?;
-        let library_meta_path = library_path.join("library.json");
+        let library_meta_path = library_path.join("manifest.json");
 
         if !library_meta_path.exists() {
             Self::create_default(app_handle)?;

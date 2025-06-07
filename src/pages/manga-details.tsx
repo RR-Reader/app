@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { MangaEntry, Category } from "@/types";
+import { MangaEntry, CategoryMeta } from "@/types";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import {
@@ -54,7 +54,7 @@ interface MangaAddProps {
 function AddMangaDialog({ manga, onAdd, children }: MangaAddProps) {
   const { data: library, isLoading: libraryLoading } =
     LIBRARY_HOOKS.useLoadLibrary();
-  const categories: Category[] = library?.categories || [];
+  const categories: CategoryMeta[] = library?.categories || [];
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -318,7 +318,7 @@ export default function MangaDetail() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex h-full items-center justify-center">
         <div className="text-center">
           <div className="border-primary mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2" />
           <p>Loading manga details...</p>
@@ -329,7 +329,7 @@ export default function MangaDetail() {
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex h-full items-center justify-center">
         <div className="text-center">
           <p className="text-primary text-lg font-semibold">
             Error loading manga details

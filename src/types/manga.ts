@@ -1,11 +1,11 @@
-type MangaEntry = {
+interface MangaEntry {
   id: string;
   source: string;
   title: string;
   cover_url?: string;
-};
+}
 
-type Manga = {
+interface Manga {
   id: string;
   title: string;
   artists: string[];
@@ -14,17 +14,17 @@ type Manga = {
   description: string;
   cover_url: string;
   chapters: ChapterEntry[];
-};
+}
 
-type ChapterEntry = {
+interface ChapterEntry {
   id: string;
   title: string;
   released_since: string;
-};
+}
 
-type Chapter = {
+interface Chapter {
   url: string;
   pages: string[];
-};
+}
 
 export type { Chapter, ChapterEntry, Manga, MangaEntry };

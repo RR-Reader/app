@@ -4,6 +4,7 @@ import LIBRARY_HOOKS from "@/hooks/use-library";
 import { cn } from "@/lib/utils";
 import { useParams } from "react-router";
 import { useGrid } from "@/hooks/settings/use-grid";
+import { Loader2, Trash2, Brush } from "lucide-react";
 
 function ErrorFallback({
   error,
@@ -25,25 +26,14 @@ function ErrorFallback({
   );
 }
 
-function LoadingSkeleton({ grid }: { grid: number }) {
+function Loading() {
   return (
-    <div
-      className={cn(
-        "grid gap-4",
-        grid === 6 && "grid-cols-6",
-        grid === 8 && "grid-cols-8",
-        grid === 10 && "grid-cols-10",
-        grid === 12 && "grid-cols-12",
-        grid === 16 && "grid-cols-16",
-      )}
-    >
-      {Array.from({ length: grid }).map((_, index) => (
-        <div key={index} className="animate-pulse">
-          <div className="mb-2 aspect-[3/4] rounded-lg bg-gray-200"></div>
-          <div className="mb-1 h-4 rounded bg-gray-200"></div>
-          <div className="h-3 w-3/4 rounded bg-gray-200"></div>
-        </div>
-      ))}
+    <div className="flex h-full w-full flex-col items-center justify-center gap-4">
+      <div className="text-center">
+        <h1 className="text-primary text-4xl font-bold">Loading</h1>
+        <p className="text-muted-foreground text-sm">Please wait</p>
+      </div>
+      <Loader2 className="text-primary animate-spin" />
     </div>
   );
 }
@@ -56,11 +46,19 @@ export default function Category() {
 
   return (
     <>
-      <header className="px-4 py-2">
-        <h1 className="text-2xl font-semibold">{data?.title}</h1>
+      <header className="flex w-full items-center justify-between px-4 py-2">
+        <h1 className="text-3xl font-semibold">{data?.title}</h1>
+        <div className="inline-flex items-center gap-4">
+          <Button size={"icon"} className="size-8" variant="outline">
+            <Trash2 />
+          </Button>
+          <Button size={"icon"} className="size-8" variant="outline">
+            <Brush />
+          </Button>
+        </div>
       </header>
-      <div className="h-full overflow-hidden">
-        {(isLoading || isRefetching) && <LoadingSkeleton grid={grid} />}
+      <div>
+        {(isLoading || isRefetching) && <Loading />}
 
         {error && (
           <ErrorFallback
@@ -95,4 +93,7 @@ export default function Category() {
       </div>
     </>
   );
+}
+{
+  /*  */
 }

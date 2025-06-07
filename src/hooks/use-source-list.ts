@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { SourceEntry } from "@/types";
-import { invoke } from "@tauri-apps/api/core";
 
 const useFetchSourceList = () =>
   useQuery({

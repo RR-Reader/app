@@ -1,13 +1,13 @@
 import type { MangaEntry } from "./manga";
 
-type CategoryMeta = {
+interface CategoryMeta {
   title: string;
   slug: string;
   sort_by: string;
   sort_order: "asc" | "desc";
 };
 
-type Category = {
+interface Category {
   title: string;
   slug: string;
   entries: MangaEntry[];
@@ -15,7 +15,7 @@ type Category = {
   sort_order: "asc" | "desc";
 };
 
-type Library = {
+interface Library {
   categories: CategoryMeta[];
 };
 

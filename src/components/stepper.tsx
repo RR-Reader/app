@@ -4,14 +4,21 @@ import React from "react";
 
 interface StepperProps {
   value?: number;
+  step?: number;
   onChange?: (value: number) => void;
   min?: number;
   max?: number;
 }
 
-export function Stepper({ value, onChange, min = 0, max }: StepperProps) {
+export function Stepper({
+  value = 0,
+  onChange,
+  min = 0,
+  max,
+  step = 1,
+}: StepperProps) {
   const isControlled = value !== undefined;
-  const [internalValue, setInternalValue] = React.useState(value ?? 0);
+  const [internalValue, setInternalValue] = React.useState(value);
   const currentValue = isControlled ? value! : internalValue;
 
   const setValueSafely = (newValue: number) => {
@@ -26,8 +33,8 @@ export function Stepper({ value, onChange, min = 0, max }: StepperProps) {
     <div className="inline-flex">
       <Button
         size="icon"
-        className="size-8"
-        onClick={() => setValueSafely(currentValue - 1)}
+        className="size-9 rounded-r-none"
+        onClick={() => setValueSafely(currentValue - step)}
         aria-label="Decrease value"
         variant="outline"
         disabled={currentValue <= (min ?? -Infinity)}
@@ -35,7 +42,7 @@ export function Stepper({ value, onChange, min = 0, max }: StepperProps) {
         <Minus />
       </Button>
       <div
-        className="dark:border-input size-8 place-content-center border border-y text-center"
+        className="dark:border-input size-9 place-content-center border border-y text-center"
         role="spinbutton"
         aria-valuenow={currentValue}
         aria-valuemin={min}
@@ -45,8 +52,8 @@ export function Stepper({ value, onChange, min = 0, max }: StepperProps) {
       </div>
       <Button
         size="icon"
-        className="size-8"
-        onClick={() => setValueSafely(currentValue + 1)}
+        className="size-9 rounded-l-none"
+        onClick={() => setValueSafely(currentValue + step)}
         disabled={currentValue >= (max ?? Infinity)}
         aria-label="Increase value"
         variant="outline"

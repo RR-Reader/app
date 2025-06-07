@@ -14,9 +14,11 @@
       {
         "title": "RReader",
         "width": 1280,
-        "height": 720
+        "height": 720,
+        "decorations": false
       }
     ],
+
     "security": {
       "csp": null,
       "capabilities": [
@@ -24,7 +26,15 @@
           "identifier": "main-capability",
           "description": "Main window capability",
           "windows": ["main"],
-          "permissions": ["core:default", "opener:default", "shell:default"]
+          "permissions": [
+            "core:default",
+            "opener:default",
+            "shell:default",
+            "core:window:allow-minimize",
+            "core:window:allow-toggle-maximize",
+            "core:window:allow-close",
+            "core:window:allow-start-dragging"
+          ]
         }
       ]
     }

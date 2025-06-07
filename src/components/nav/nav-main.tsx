@@ -26,6 +26,7 @@ import {
 import { Link, useLocation } from "react-router";
 import LIBRARY_HOOKS from "@/hooks/use-library";
 import { cn } from "@/lib/utils";
+import { NavCreateCategoryDialog } from "./nav-create-cat";
 
 export function NavMain() {
   const { data } = LIBRARY_HOOKS.useLoadLibrary();
@@ -164,10 +165,12 @@ export function NavMain() {
                       </SidebarMenuSub>
                       <SidebarMenuSub>
                         <SidebarMenuSubItem>
-                          <SidebarMenuSubButton className="cursor-pointer justify-between">
-                            Create Category
-                            <Plus />
-                          </SidebarMenuSubButton>
+                          <NavCreateCategoryDialog>
+                            <SidebarMenuSubButton className="cursor-pointer justify-between">
+                              Create Category
+                              <Plus />
+                            </SidebarMenuSubButton>
+                          </NavCreateCategoryDialog>
                         </SidebarMenuSubItem>
                       </SidebarMenuSub>
                     </CollapsibleContent>

@@ -4,9 +4,11 @@ import { SettingRenderer } from "@/components/settings/settings-renderer";
 import { usePreferences } from "@/hooks/settings/use-settings";
 import { BookOpen } from "lucide-react";
 import { Stepper } from "@/components/stepper";
+import { useState } from "react";
 
 export default function ReaderPreferences() {
   const { preferences, updatePreferences } = usePreferences();
+  const [stepNum, setStepNum] = useState(100);
 
   if (!preferences) return <div>Loading...</div>;
 
@@ -80,7 +82,12 @@ export default function ReaderPreferences() {
 
           {preferences.reader_display.zoom_behavior === "manual" && (
             <SettingItem title="Zoom Level" description="Adjust zoom level">
-              <Stepper max={15} />
+              <Stepper
+                max={200}
+                value={stepNum}
+                onChange={setStepNum}
+                step={25}
+              />
             </SettingItem>
           )}
 

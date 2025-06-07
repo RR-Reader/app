@@ -1,11 +1,11 @@
 import type { MangaEntry } from "./manga";
 
-type ExploreSection = {
+interface ExploreSection {
   title: string;
   entries: MangaEntry[];
-};
+}
 
-type ExplorePage = {
+interface ExplorePage  {
   source: string;
   sections: ExploreSection[];
 };
