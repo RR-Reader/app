@@ -1,4 +1,4 @@
-import { MangaCard } from "@/components/manga-card";
+import { CategoryCard } from "@/components/manga-card";
 import { Button } from "@/components/ui/button";
 import LIBRARY_HOOKS from "@/hooks/use-library";
 import { cn } from "@/lib/utils";
@@ -73,14 +73,15 @@ export default function Category() {
           <div
             className={cn(
               "grid gap-4 p-4",
+              grid === 4 && "grid-cols-4",
               grid === 6 && "grid-cols-6",
               grid === 8 && "grid-cols-8",
+              grid === 10 && "grid-cols-10",
               grid === 12 && "grid-cols-12",
-              grid === 16 && "grid-cols-16",
             )}
           >
             {data.entries.map((entry) => (
-              <MangaCard
+              <CategoryCard
                 key={`${entry.source}-${entry.id}`}
                 source={entry.source}
                 id={entry.id}

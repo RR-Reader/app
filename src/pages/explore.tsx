@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router";
 
 function ErrorFallback({
   error,
@@ -52,6 +53,7 @@ export default function Explore() {
     <>
       {error && <ErrorFallback error={error} onRetry={() => {}} />}{" "}
       {isLoading && <LoadingFallback grid={4} />}
+      <Link to="/manga/1234/1234/chapter/1234" >test</Link>
     </>
   );
 }

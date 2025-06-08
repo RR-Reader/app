@@ -1,6 +1,6 @@
 import { Outlet } from "react-router";
 import { SidebarProvider } from "../components/ui/sidebar";
-import { AppSidebar } from "../components/sidebar";
+import { AppSidebar } from "../components/nav";
 import { TitleBar } from "@/components/titlebar";
 
 export default function BaseLayout() {
@@ -10,7 +10,7 @@ export default function BaseLayout() {
 
       <div className="bg-sidebar relative min-h-screen w-full overflow-hidden pb-10">
         <TitleBar />
-        <main className="bg-background mt-8 h-full overflow-hidden sm:rounded-l-2xl">
+        <main className="bg-background mt-8 h-full overflow-hidden">
           <Outlet />
         </main>
       </div>

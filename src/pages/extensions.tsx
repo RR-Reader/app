@@ -1,8 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { useSearchParams } from "react-router";
 import { useFetchSourceList } from "@/hooks/use-source-list";
-import { open } from "@tauri-apps/plugin-shell";
-
+import { FilterSheet } from "@/components/extensions/filter-sheet";
 import {
   Select,
   SelectContent,
@@ -10,25 +9,15 @@ import {
   SelectValue,
   SelectTrigger,
 } from "@/components/ui/select";
-import {
-  Card,
-  CardHeader,
-  CardFooter,
-  CardContent,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 import React from "react";
 import { cn } from "@/lib/utils";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGithub } from "@fortawesome/free-brands-svg-icons";
-import { RefreshCcw, Download, Trash2, CheckCircle } from "lucide-react";
-import { extensionsAPI } from "@/api/extensions";
-import { Extension } from "@/types/extensions";
+import { Filter, RefreshCcw } from "lucide-react";
+import EXTENSIONS_HOOKS from "@/hooks/use-extension";
+import { ExtensionCard } from "@/components/extensions/extension-card";
+import { toast } from "sonner";
 
 type SearchOptions =
   | "name"
@@ -56,34 +45,22 @@ interface ExtensionWithStatus {
 function useExtensionParams() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchBy, setSearchBy] = React.useState<SearchOptions>("name");
-  const [installedExtensions, setInstalledExtensions] = React.useState<
-    Extension[]
-  >([]);
-  const [isLoadingInstalled, setIsLoadingInstalled] = React.useState(false);
   const plugin = searchParams.get("plugin");
 
   const {
+    extensions: installedExtensions,
+    isLoading: isLoadingInstalled,
+    refetch: refetchInstalled,
+  } = EXTENSIONS_HOOKS.useExtensionsWithHelpers();
+
+  const {
     data: sourceExtensions,
-    isRefetching,
-    refetch,
+    isRefetching: isRefetchingSource,
+    refetch: refetchSource,
   } = useFetchSourceList();
 
-  const loadInstalledExtensions = React.useCallback(async () => {
-    try {
-      setIsLoadingInstalled(true);
-      const manager = await extensionsAPI.loadExtensions();
-      setInstalledExtensions(manager.extensions);
-    } catch (error) {
-      console.error("Failed to load installed extensions:", error);
-      setInstalledExtensions([]);
-    } finally {
-      setIsLoadingInstalled(false);
-    }
-  }, []);
-
-  React.useEffect(() => {
-    loadInstalledExtensions();
-  }, [loadInstalledExtensions]);
+  const addExtensionMutation = EXTENSIONS_HOOKS.useAddExtension();
+  const removeExtensionMutation = EXTENSIONS_HOOKS.useRemoveExtension();
 
   const handleSetParams = (query: string) => {
     setSearchParams({ plugin: query });
@@ -141,14 +118,12 @@ function useExtensionParams() {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "");
 
-      await extensionsAPI.addExtension(
-        ext.name,
+      await addExtensionMutation.mutateAsync({
+        name: ext.name,
         slug,
-        ext.version,
-        ext.download_url,
-      );
-
-      await loadInstalledExtensions();
+        version: ext.version,
+        repository: ext.download_url,
+      });
 
       console.log(`Successfully installed ${ext.name}`);
     } catch (error) {
@@ -160,9 +135,9 @@ function useExtensionParams() {
     if (!ext.slug) return;
 
     try {
-      await extensionsAPI.removeExtension(ext.slug);
-
-      await loadInstalledExtensions();
+      await removeExtensionMutation.mutateAsync({
+        slug: ext.slug,
+      });
 
       console.log(`Successfully removed ${ext.name}`);
     } catch (error) {
@@ -171,18 +146,27 @@ function useExtensionParams() {
   };
 
   const handleRefresh = async () => {
-    await Promise.all([refetch(), loadInstalledExtensions()]);
+    await Promise.all([refetchSource(), refetchInstalled()]);
   };
+
+  const isRefetching = isRefetchingSource || isLoadingInstalled;
+  const isMutating =
+    addExtensionMutation.isPending || removeExtensionMutation.isPending;
 
   return {
     data: filteredData,
     handleSetParams,
-    isRefetching: isRefetching || isLoadingInstalled,
+    isRefetching: isRefetching || isMutating,
     refetch: handleRefresh,
     searchBy,
     setSearchBy,
     handleInstallExtension,
     handleRemoveExtension,
+
+    isInstalling: addExtensionMutation.isPending,
+    isRemoving: removeExtensionMutation.isPending,
+    installError: addExtensionMutation.error,
+    removeError: removeExtensionMutation.error,
   };
 }
 
@@ -196,15 +180,47 @@ export default function Extensions() {
     refetch,
     handleInstallExtension,
     handleRemoveExtension,
+    isInstalling,
+    isRemoving,
+    installError,
+    removeError,
   } = useExtensionParams();
+
+  const action = {
+    install: handleInstallExtension,
+    remove: handleRemoveExtension,
+  };
+
+  console.log("Extensions data:", data);
+
+  React.useEffect(() => {
+    if (installError) {
+      toast.error("Failed to install extension: " + installError.message);
+    }
+  }, [installError]);
+
+  React.useEffect(() => {
+    if (removeError) {
+      toast.error("Failed to remove extension: " + removeError.message);
+    }
+  }, [removeError]);
 
   return (
     <>
       <header className="flex items-center justify-between p-4">
-        <h1 className="text-3xl font-semibold">Extensions</h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-3xl font-semibold">Extensions</h1>
+          {(isInstalling || isRemoving) && (
+            <div className="text-muted-foreground flex items-center gap-2 text-sm">
+              <RefreshCcw className="h-4 w-4 animate-spin" />
+              {isInstalling && "Installing..."}
+              {isRemoving && "Removing..."}
+            </div>
+          )}
+        </div>
         <div className="inline-flex gap-4">
           <Select value={searchBy} onValueChange={setSearchBy}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="hidden w-full max-w-48 sm:flex">
               <SelectValue placeholder="Search by..." />
             </SelectTrigger>
             <SelectContent>
@@ -215,11 +231,11 @@ export default function Extensions() {
             </SelectContent>
           </Select>
           <Input
-            className="max-w-72"
+            className="hidden max-w-72 sm:flex"
             placeholder="Search extensions..."
             onChange={(e) => handleSetParams(e.target.value)}
           />
-          <Button size="icon" onClick={() => refetch()}>
+          <Button size="icon" onClick={() => refetch()} disabled={isRefetching}>
             <RefreshCcw
               className={cn(
                 "transition-all duration-200",
@@ -227,116 +243,36 @@ export default function Extensions() {
               )}
             />
           </Button>
+          <FilterSheet
+            query={handleSetParams}
+            setFilter={setSearchBy}
+            filter={searchBy}
+          >
+            <Button size="icon" className="flex sm:hidden" variant="outline">
+              <Filter />
+            </Button>
+          </FilterSheet>
         </div>
       </header>
+
       <div className="grid w-full grid-cols-1 gap-4 p-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {data.map((entry) => (
-          <Card
-            key={entry.id}
-            className={cn(
-              "relative",
-              entry.isInstalled &&
-                "bg-green-50/50 ring-2 ring-green-500/20 dark:bg-green-950/20",
-            )}
-          >
-            {entry.isInstalled && (
-              <div className="absolute top-2 right-2">
-                <Badge variant="default" className="bg-green-500">
-                  <CheckCircle className="mr-1 h-3 w-3" />
-                  Installed
-                </Badge>
-              </div>
-            )}
-
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="inline-flex items-center gap-2">
-                  <img
-                    src={entry.icon_url || undefined}
-                    className="size-6"
-                    alt={`${entry.name} icon`}
-                  />
-                  <CardTitle className="text-base">{entry.name}</CardTitle>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <Badge variant="outline">{entry.version}</Badge>
-                  {entry.isInstalled &&
-                    entry.installedVersion !== entry.version && (
-                      <Badge variant="secondary" className="text-xs">
-                        v{entry.installedVersion}
-                      </Badge>
-                    )}
-                </div>
-              </div>
-              <CardDescription className="text-sm">
-                {entry.description}
-              </CardDescription>
-            </CardHeader>
-
-            <CardContent>
-              <div className="-mt-4 mb-2 flex flex-wrap items-center gap-1">
-                {entry.tags.map((tag) => (
-                  <Badge key={tag} variant="secondary" className="text-xs">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-
-              <div className="text-muted-foreground grid grid-cols-1 gap-1 text-xs sm:grid-cols-2">
-                <p>
-                  <strong className="text-black dark:text-white">
-                    Language:
-                  </strong>{" "}
-                  {entry.language}
-                </p>
-                <p>
-                  <strong className="text-black dark:text-white">
-                    Content Rating:
-                  </strong>{" "}
-                  {entry.content_rating}
-                </p>
-              </div>
-            </CardContent>
-
-            <CardFooter className="flex flex-row justify-between gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => open(entry.source_url)}
-              >
-                <FontAwesomeIcon icon={faGithub} className="h-4 w-4" />
-              </Button>
-
-              <div className="flex gap-2">
-                {entry.isInstalled ? (
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleRemoveExtension(entry)}
-                  >
-                    <Trash2 className="mr-1 h-4 w-4" />
-                    Remove
-                  </Button>
-                ) : (
-                  <Button
-                    size="sm"
-                    onClick={() => handleInstallExtension(entry)}
-                  >
-                    <Download className="mr-1 h-4 w-4" />
-                    Install
-                  </Button>
-                )}
-              </div>
-            </CardFooter>
-          </Card>
+          <ExtensionCard key={entry.id} entry={entry} actions={action} />
         ))}
       </div>
 
-      {data.length === 0 && (
+      {data.length === 0 && !isRefetching && (
         <div className="flex flex-col items-center justify-center p-8 text-center">
           <p className="text-muted-foreground">
             No extensions found matching your search.
           </p>
+        </div>
+      )}
+
+      {data.length === 0 && isRefetching && (
+        <div className="flex flex-col items-center justify-center p-8 text-center">
+          <RefreshCcw className="text-muted-foreground mb-4 h-8 w-8 animate-spin" />
+          <p className="text-muted-foreground">Loading extensions...</p>
         </div>
       )}
     </>

@@ -42,10 +42,11 @@ export default function LayoutAppearance() {
                   "Choose how many columns to display in library view.",
                 type: "select",
                 options: [
+                  { value: "4", label: "4" },
                   { value: "6", label: "6" },
                   { value: "8", label: "8" },
+                  { value: "10", label: "10" },
                   { value: "12", label: "12" },
-                  { value: "16", label: "16" },
                 ],
               }}
               value={preferences.layout_appearance.grid_size}
@@ -92,8 +93,8 @@ export default function LayoutAppearance() {
                 description: "Choose the visual style for manga cover images.",
                 type: "select",
                 options: [
+                  { value: "default", label: "Default" },
                   { value: "rounded", label: "Rounded" },
-                  { value: "square", label: "Square" },
                   { value: "border", label: "Border" },
                   { value: "shadow", label: "Shadow" },
                 ],

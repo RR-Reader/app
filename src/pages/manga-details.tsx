@@ -43,7 +43,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-import { CardContextMenu } from "@/components/context-menus/manga-card-menu";
+import { CardContextMenu } from "@/components/manga-card/manga-card-menu";
 
 interface MangaAddProps {
   onAdd: (manga: MangaEntry, category: string) => Promise<void>;

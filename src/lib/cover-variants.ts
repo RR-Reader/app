@@ -1,4 +1,3 @@
-
 import { cva, type VariantProps } from "class-variance-authority";
 
 export const coverVariants = cva(
@@ -6,8 +5,8 @@ export const coverVariants = cva(
   {
     variants: {
       style: {
+        default: "rounded-none",
         rounded: "rounded-2xl",
-        square: "rounded-none",
         border: "rounded-lg border-2",
         shadow: "rounded-lg shadow-lg hover:shadow-xl",
       },

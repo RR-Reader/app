@@ -1,41 +1,56 @@
 import { useCoverStyle } from "@/hooks/settings/use-cover-style";
 import {
   ContextMenu,
-  ContextMenuCheckboxItem,
   ContextMenuContent,
-  ContextMenuLabel,
   ContextMenuRadioGroup,
   ContextMenuRadioItem,
-  ContextMenuSeparator,
   ContextMenuSub,
   ContextMenuSubContent,
   ContextMenuSubTrigger,
   ContextMenuTrigger,
+  ContextMenuItem,
 } from "../ui/context-menu";
-import { useShowTitles } from "@/hooks/settings/use-show-titles";
+
+import { LayoutGrid, Type, Trash2 } from "lucide-react";
 
 interface CardContextMenuProps {
   id?: string;
   children?: React.ReactNode;
+  isFavorite?: boolean;
 }
 
-export function CardContextMenu({ children }: CardContextMenuProps) {
-  const { coverStyle, setCoverStyle } = useCoverStyle();
-  const { showTitles, setShowTitles } = useShowTitles();
+export function CardContextMenu({
+  children,
+  isFavorite,
+}: CardContextMenuProps) {
+  const {
+    coverStyle,
+    setCoverStyle,
+    showTitles,
+    setShowTitles,
+    compactMode,
+    setCompactMode,
+  } = useCoverStyle();
 
   return (
     <ContextMenu>
       <ContextMenuTrigger>{children}</ContextMenuTrigger>
+
       <ContextMenuContent>
-        <ContextMenuLabel>Settings</ContextMenuLabel>
-        <ContextMenuSeparator />
-        <ContextMenuCheckboxItem
-          checked={showTitles}
-          onCheckedChange={setShowTitles}
-        >
+        <ContextMenuItem onClick={() => setShowTitles(!showTitles)}>
+          <Type />
           Show Titles
-        </ContextMenuCheckboxItem>
-        <ContextMenuCheckboxItem>Favorite</ContextMenuCheckboxItem>
+        </ContextMenuItem>
+        <ContextMenuItem onClick={() => setCompactMode(!compactMode)}>
+          <LayoutGrid />
+          Compact Mode
+        </ContextMenuItem>
+        {isFavorite && (
+          <ContextMenuItem>
+            <Trash2 />
+            Remove series
+          </ContextMenuItem>
+        )}
         <ContextMenuSub>
           <ContextMenuSubTrigger>Cover Style</ContextMenuSubTrigger>
           <ContextMenuSubContent>
@@ -47,12 +62,12 @@ export function CardContextMenu({ children }: CardContextMenuProps) {
                 );
               }}
             >
+              <ContextMenuRadioItem value="default">
+                Default
+              </ContextMenuRadioItem>
               <ContextMenuRadioItem value="border">Border</ContextMenuRadioItem>
               <ContextMenuRadioItem value="rounded">
                 Rounded
-              </ContextMenuRadioItem>
-              <ContextMenuRadioItem value="square">
-                Squared
               </ContextMenuRadioItem>
               <ContextMenuRadioItem value="shadow">Shadow</ContextMenuRadioItem>
             </ContextMenuRadioGroup>
