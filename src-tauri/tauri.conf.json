@@ -33,7 +33,17 @@
             "core:window:allow-minimize",
             "core:window:allow-toggle-maximize",
             "core:window:allow-close",
-            "core:window:allow-start-dragging"
+            "core:window:allow-start-dragging",
+            "fs-capability"
+          ]
+        },
+        {
+          "identifier": "fs-capability",
+          "permissions": [
+            "fs:read-files",
+            "fs:allow-mkdir",
+            "fs:scope-appdata",
+            "fs:scope-appdata-recursive"
           ]
         }
       ]
