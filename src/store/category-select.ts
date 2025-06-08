@@ -6,17 +6,15 @@ interface LibraryItemSelectState {
   clearSelection: () => void;
 }
 
-export const useLibraryItemSelect = create<LibraryItemSelectState>(
-  (set, get) => ({
-    selectedItems: [],
-    toggleItem: (item: string) => {
-      const current = get().selectedItems;
-      if (current.includes(item)) {
-        set({ selectedItems: current.filter((c) => c !== item) });
-      } else {
-        set({ selectedItems: [...current, item] });
-      }
-    },
-    clearSelection: () => set({ selectedItems: [] }),
-  }),
-);
+export const useLibraryItemSelect = create<LibraryItemSelectState>((set) => ({
+  selectedItems: [],
+  toggleItem: (item: string) =>
+    set((state) => {
+      const updatedItems = state.selectedItems.includes(item)
+        ? state.selectedItems.filter((c) => c !== item)
+        : [...state.selectedItems, item];
+
+      return { selectedItems: updatedItems };
+    }),
+  clearSelection: () => set({ selectedItems: [] }),
+}));

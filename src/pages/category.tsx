@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 import { useParams } from "react-router";
 import { useGrid } from "@/hooks/settings/use-grid";
 import { Loader2, Trash2, Brush } from "lucide-react";
+import { useLibraryItemSelect } from "@/store/category-select";
+import React from "react";
 
 function ErrorFallback({
   error,
@@ -43,21 +45,60 @@ export default function Category() {
   const { slug } = useParams<{ slug: string }>();
   const { data, isLoading, error, refetch, isRefetching } =
     LIBRARY_HOOKS.useFetchCategory(slug);
+  const [isSelecting, setIsSelecting] = React.useState<boolean>(false);
+  const { selectedItems, clearSelection } = useLibraryItemSelect();
 
-  return (
-    <>
+  function CategoryHeader() {
+    if (isSelecting) {
+      return (
+        <header className="flex w-full items-center justify-between px-4 py-2">
+          <div className="inline-flex gap-2">
+            <h1 className="text-3xl font-semibold">{data?.title}</h1>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsSelecting(!isSelecting);
+                clearSelection();
+              }}
+            >
+              Stop Selecting
+            </Button>
+          </div>
+          <p className="text-muted-foreground">
+            {selectedItems.length} items selected
+          </p>
+        </header>
+      );
+    }
+
+    return (
       <header className="flex w-full items-center justify-between px-4 py-2">
-        <h1 className="text-3xl font-semibold">{data?.title}</h1>
+        <div className="inline-flex gap-2">
+          <h1 className="text-3xl font-semibold">{data?.title}</h1>
+          <Button
+            variant="outline"
+            onClick={() => setIsSelecting(!isSelecting)}
+          >
+            Select
+          </Button>
+        </div>
         <div className="inline-flex items-center gap-4">
-          <Button size={"icon"} className="size-8" variant="outline">
+          <Button size="icon" className="size-8" variant="outline">
             <Trash2 />
           </Button>
-          <Button size={"icon"} className="size-8" variant="outline">
+          <Button size="icon" className="size-8" variant="outline">
             <Brush />
           </Button>
         </div>
       </header>
+    );
+  }
+
+  return (
+    <>
       <div>
+        <CategoryHeader />
+
         {(isLoading || isRefetching) && <Loading />}
 
         {error && (
@@ -87,6 +128,7 @@ export default function Category() {
                 id={entry.id}
                 title={entry.title}
                 coverUrl={entry.cover_url}
+                isSelecting={isSelecting}
               />
             ))}
           </div>

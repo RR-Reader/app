@@ -13,8 +13,7 @@ type MangaCardProps = {
   id: string;
   source: string;
   size?: number;
-  isFavorite?: boolean;
-  isSelecting?: boolean;
+  isSelecting: boolean;
 };
 
 export function CategoryCard({
@@ -23,14 +22,13 @@ export function CategoryCard({
   id,
   source,
   size = 6,
-  isFavorite = true,
-  isSelecting = true,
+  isSelecting,
 }: MangaCardProps & VariantProps<typeof coverVariants>) {
   const { coverStyle, showTitles, compactMode } = useCoverStyle();
 
-  const { selectedItems } = useLibraryItemSelect();
-
-  const isSelected = selectedItems.includes(id);
+  const { selectedItems, toggleItem } = useLibraryItemSelect();
+  const uniqueKey = `${source}-${id}`;
+  const isSelected = selectedItems.includes(uniqueKey);
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => {
     const wrapClass = cn(
@@ -43,7 +41,16 @@ export function CategoryCard({
     );
 
     if (isSelecting) {
-      return <button className={wrapClass}>{children}</button>;
+      return (
+        <button
+          className={wrapClass}
+          onClick={() => {
+            toggleItem(uniqueKey);
+          }}
+        >
+          {children}
+        </button>
+      );
     }
 
     return (
@@ -54,12 +61,12 @@ export function CategoryCard({
   };
 
   return (
-    <CardContextMenu isFavorite={isFavorite}>
+    <CardContextMenu>
       <Wrapper>
         <img
           className={cn(
             coverVariants({ style: coverStyle }),
-            isSelecting && isSelected && "ring-primary ring-2",
+            isSelecting && isSelected && "ring-primary ring-3",
           )}
           src={coverUrl}
           alt="manga cover"
@@ -68,7 +75,7 @@ export function CategoryCard({
           <>
             {showTitles && (
               <div className="absolute right-0 bottom-0 left-0 bg-black/80 p-2 opacity-0 transition-opacity group-hover:opacity-100">
-                <h2 className="line-clamp-2 text-sm font-medium text-white">
+                <h2 className="line-clamp-2 text-left text-sm font-medium text-white">
                   {title}
                 </h2>
               </div>
@@ -77,7 +84,7 @@ export function CategoryCard({
         ) : (
           <>
             {showTitles && (
-              <h2 className="line-clamp-2 text-sm font-medium overflow-ellipsis">
+              <h2 className="line-clamp-2 text-left text-sm font-medium overflow-ellipsis">
                 {title}
               </h2>
             )}

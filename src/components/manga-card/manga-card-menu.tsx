@@ -16,13 +16,9 @@ import { LayoutGrid, Type, Trash2 } from "lucide-react";
 interface CardContextMenuProps {
   id?: string;
   children?: React.ReactNode;
-  isFavorite?: boolean;
 }
 
-export function CardContextMenu({
-  children,
-  isFavorite,
-}: CardContextMenuProps) {
+export function CardContextMenu({ children }: CardContextMenuProps) {
   const {
     coverStyle,
     setCoverStyle,
@@ -45,12 +41,12 @@ export function CardContextMenu({
           <LayoutGrid />
           Compact Mode
         </ContextMenuItem>
-        {isFavorite && (
-          <ContextMenuItem>
-            <Trash2 />
-            Remove series
-          </ContextMenuItem>
-        )}
+
+        <ContextMenuItem>
+          <Trash2 />
+          Remove series
+        </ContextMenuItem>
+
         <ContextMenuSub>
           <ContextMenuSubTrigger>Cover Style</ContextMenuSubTrigger>
           <ContextMenuSubContent>
