@@ -13,7 +13,6 @@ import Reader from "./pages/reader";
 
 import Experimental from "./pages/settings/experimental";
 import ReaderPreferences from "./pages/settings/reader-preferences";
-import StorageCaching from "./pages/settings/storage-caching";
 import SystemBehavior from "./pages/settings/system-behavior";
 import LayoutAppearance from "./pages/settings/layout-appearance";
 import LibraryHistory from "./pages/settings/library-history";
@@ -35,10 +34,6 @@ const settingsRoutes: RouteObject[] = [
   {
     path: "library-history",
     element: <LibraryHistory />,
-  },
-  {
-    path: "storage-caching",
-    element: <StorageCaching />,
   },
   {
     path: "system-behavior",

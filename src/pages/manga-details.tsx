@@ -1,6 +1,5 @@
 import { useParams } from "react-router";
-import MANGA_HOOKS from "@/hooks/use-manga";
-import LIBRARY_HOOKS from "@/hooks/use-library";
+import { useLibrary } from "@/hooks/use-library";
 import { Button } from "@/components/ui/button";
 import { Heart, BookOpen, Star, Loader2, Trash2 } from "lucide-react";
 import { useCoverStyle } from "@/hooks/settings/use-cover-style";
@@ -52,8 +51,7 @@ interface MangaAddProps {
 }
 
 function AddMangaDialog({ manga, onAdd, children }: MangaAddProps) {
-  const { data: library, isLoading: libraryLoading } =
-    LIBRARY_HOOKS.useLoadLibrary();
+  const { data: library, isLoading: libraryLoading } = useLibrary();
   const categories: CategoryMeta[] = library?.categories || [];
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
@@ -235,207 +233,11 @@ function RemoveMangaDialog({
 }
 
 export default function MangaDetail() {
-  const { id, source } = useParams<{
-    id: string;
-    source: string;
-  }>();
+  // const { id, source } = useParams<{
+  //   id: string;
+  //   source: string;
+  // }>();
   const { coverStyle } = useCoverStyle();
 
-  const { data, isLoading, error } = MANGA_HOOKS.useQueryMangaInfo(id, source);
-
-  console.log("Manga Data", data);
-
-  const mangaEntry: MangaEntry = {
-    id: id!,
-    title: data?.title || "Unknown Title",
-    source: source!,
-    cover_url: data?.cover_url || "",
-  };
-
-  const { isInLibrary, category } = LIBRARY_HOOKS.useMangaInLibrary(mangaEntry);
-
-  const { mutateAsync: addMangaToCategory } =
-    LIBRARY_HOOKS.useAddMangaToCategory();
-
-  const { mutateAsync: removeMangaFromCategory } =
-    LIBRARY_HOOKS.useRemoveMangaFromCategory();
-
-  const handleAddManga = async (manga: MangaEntry, category: string) => {
-    return addMangaToCategory({
-      categoryName: category,
-      mangaEntry: manga,
-    });
-  };
-
-  const handleRemoveManga = async (manga: MangaEntry) => {
-    console.log("Remove manga debug:", {
-      category,
-      categoryType: typeof category,
-      mangaId: manga.id,
-      mangaSource: manga.source,
-    });
-
-    console.log("Test:", category);
-
-    if (!category) {
-      throw new Error("Cannot determine which category to remove manga from");
-    }
-
-    if (!category?.trim()) {
-      throw new Error("Category name is empty");
-    }
-
-    if (!manga.id?.trim()) {
-      throw new Error("Manga ID is empty");
-    }
-
-    if (!manga.source?.trim()) {
-      throw new Error("Manga source is empty");
-    }
-
-    return removeMangaFromCategory({
-      categoryName: category,
-      mangaId: manga.id,
-      mangaSource: manga.source,
-    });
-  };
-
-  const LibraryButton = ({ children }: { children: React.ReactNode }) => {
-    if (isInLibrary) {
-      return (
-        <RemoveMangaDialog onRemove={handleRemoveManga} manga={mangaEntry}>
-          {children}
-        </RemoveMangaDialog>
-      );
-    }
-
-    return (
-      <AddMangaDialog manga={mangaEntry} onAdd={handleAddManga}>
-        {children}
-      </AddMangaDialog>
-    );
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
-          <div className="border-primary mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2" />
-          <p>Loading manga details...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
-          <p className="text-primary text-lg font-semibold">
-            Error loading manga details
-          </p>
-          <p className="text-muted-foreground text-sm">{error.message}</p>
-          <p className="text-muted-foreground mt-2 text-xs">
-            Source: {source} | Manga ID: {id}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="container mx-auto max-w-6xl p-4">
-      <div className="flex flex-col gap-6 lg:flex-row">
-        <CardContextMenu>
-          <div className="flex-shrink-0">
-            <img
-              src={data?.cover_url}
-              alt={data?.title}
-              className={cn(
-                coverVariants({ style: coverStyle, type: "image" }),
-                "mx-auto h-auto max-h-96 w-full max-w-sm lg:mx-0",
-              )}
-            />
-          </div>
-        </CardContextMenu>
-
-        <div className="flex-1 space-y-4">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-3xl leading-tight font-bold">
-                {data?.title}
-              </h1>
-              <p className="text-muted-foreground mt-1 text-sm">
-                Source: <span className="font-medium">{source}</span>
-              </p>
-            </div>
-            <LibraryButton>
-              <Button
-                size="icon"
-                variant={isInLibrary ? "default" : "outline"}
-                className="shrink-0"
-              >
-                <Heart
-                  className={cn("size-4", isInLibrary && "fill-current")}
-                />
-              </Button>
-            </LibraryButton>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {data?.authors && data.authors.length > 0 && (
-              <div className="space-y-1">
-                <p className="text-primary flex items-center gap-2 text-sm font-semibold">
-                  <BookOpen className="size-4" />
-                  Authors
-                </p>
-                <p className="text-muted-foreground text-sm">
-                  {data.authors.join(", ")}
-                </p>
-              </div>
-            )}
-
-            {data?.artists && data.artists.length > 0 && (
-              <div className="space-y-1">
-                <p className="text-primary flex items-center gap-2 text-sm font-semibold">
-                  <Star className="size-4" />
-                  Artists
-                </p>
-                <p className="text-muted-foreground text-sm">
-                  {data.artists.join(", ")}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {data?.genres && data.genres.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-primary text-sm font-semibold">Genres</p>
-              <div className="flex flex-wrap gap-2">
-                {data.genres.map((genre) => (
-                  <Badge key={genre} variant="outline">
-                    {genre}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {data?.description && (
-            <div className="space-y-2">
-              <p className="text-primary text-sm font-semibold">Description</p>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                {data.description}
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* TODO */}
-      {/* Chapters Section - Add this later */}
-
-      {data?.chapters && <ChapterTable data={data?.chapters} />}
-    </div>
-  );
+  return <></>;
 }

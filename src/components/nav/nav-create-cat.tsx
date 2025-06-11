@@ -10,14 +10,15 @@ import {
 import { Input } from "../ui/input";
 import React from "react";
 import { Button } from "../ui/button";
-import LIBRARY_HOOKS from "@/hooks/use-library";
+import { useLibraryMethods } from "@/hooks/use-library";
+import { slugify } from "@/lib/utils";
 
 export function NavCreateCategoryDialog({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { mutate } = LIBRARY_HOOKS.useCreateCategory();
+  const { createCategory } = useLibraryMethods();
   const [categoryName, setCategoryName] = React.useState("");
   const [open, setOpen] = React.useState(false);
 
@@ -25,7 +26,7 @@ export function NavCreateCategoryDialog({
 
   function handleCreateCategory() {
     setOpen(false);
-    mutate({ categoryName });
+    createCategory({ title: categoryName, slug: slugify(categoryName) });
   }
 
   return (

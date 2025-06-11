@@ -7,9 +7,9 @@ export function NavHeader() {
   const AppTitle = ({ abbreviated = false }: { abbreviated?: boolean }) => (
     <h1
       className={cn("font-bold transition-all duration-200")}
-      title={abbreviated ? "RReader" : undefined}
+      title={abbreviated ? "Torigen" : undefined}
     >
-      {abbreviated ? "RR" : "RReader"}
+      {abbreviated ? "TG" : "Torigen"}
     </h1>
   );
 

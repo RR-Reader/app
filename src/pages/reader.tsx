@@ -11,7 +11,7 @@ import {
   LucideIcon,
 } from "lucide-react";
 
-import { usePreferences } from "@/hooks/settings/use-settings";
+import { usePreferences } from "@/hooks/use-preferences";
 
 import { invoke } from "@tauri-apps/api/core";
 import { useQuery } from "@tanstack/react-query";
@@ -47,7 +47,7 @@ function useFetchPages(source: Option<string>, id: Option<string>) {
 function ReaderMenu() {
   const { preferences } = usePreferences();
 
-  const currentReaderMode = preferences?.reader_display.page_layout;
+  const currentReaderMode = preferences?.reader_display_preferences.page_layout;
   const isVertical = currentReaderMode === "vertical-scroll";
 
   const [PrevIcon, NextIcon]: [LucideIcon, LucideIcon] = isVertical
@@ -136,7 +136,7 @@ export default function Reader() {
 
   const { preferences } = usePreferences();
   const isVertical =
-    preferences?.reader_display.page_layout === "vertical-scroll";
+    preferences?.reader_display_preferences.page_layout === "vertical-scroll";
 
   console.log("Pages:", pages);
 

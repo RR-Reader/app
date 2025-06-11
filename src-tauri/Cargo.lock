@@ -3,6 +3,24 @@
 version = 4
 
 [[package]]
+name = "Torigen"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "git2",
+ "moka",
+ "regex",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-fs",
+ "tauri-plugin-opener",
+ "tauri-plugin-shell",
+ "thiserror 2.0.12",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3133,24 +3151,6 @@ dependencies = [
  "wasm-streams",
  "web-sys",
  "windows-registry",
-]
-
-[[package]]
-name = "rreader"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "git2",
- "moka",
- "regex",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-fs",
- "tauri-plugin-opener",
- "tauri-plugin-shell",
- "thiserror 2.0.12",
 ]
 
 [[package]]

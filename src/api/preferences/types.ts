@@ -1,4 +1,4 @@
-interface Appreferences {
+interface AppPreferences {
   layout_preferences: LayoutPreferences;
   reader_display_preferences: ReaderPreferences;
   library_history_preferences: LibraryHistoryPreferences;
@@ -12,6 +12,7 @@ interface LayoutPreferences {
   show_titles: boolean;
   compact_mode: boolean;
   show_read_indicator: boolean;
+  cover_style: string;
 }
 
 interface ReaderPreferences {
@@ -26,6 +27,7 @@ interface LibraryHistoryPreferences {
   enabled: boolean;
   max_entries: number;
   show_recent: boolean;
+  default_library_view: string;
 }
 
 interface SystemBehaviorPreferences {
@@ -41,7 +43,7 @@ interface ExperimentalPreferences {
 }
 
 export type {
-  Appreferences,
+  AppPreferences,
   LayoutPreferences,
   ReaderPreferences,
   LibraryHistoryPreferences,

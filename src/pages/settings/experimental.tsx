@@ -1,14 +1,13 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { SettingItem } from "@/components/settings/settings-item";
 import { SettingRenderer } from "@/components/settings/settings-renderer";
-import { usePreferences } from "@/hooks/settings/use-settings";
+import { usePreferences } from "@/hooks/use-preferences";
 import { FlaskRound } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 
 export default function Experimental() {
-  const { preferences, updatePreferences } = usePreferences();
+  const { preferences, updateExperimentalPreferences } = usePreferences();
 
   if (!preferences) return <div>Loading...</div>;
 
@@ -46,12 +45,10 @@ export default function Experimental() {
                 description: "Allow loading manga from custom source plugins.",
                 type: "switch",
               }}
-              value={preferences.experimental.enable_custom_sources}
+              value={preferences.experimental_preferences.enable_custom_sources}
               onChange={(value) =>
-                updatePreferences({
-                  section: "experimental",
-                  key: "enable_custom_sources",
-                  value,
+                updateExperimentalPreferences({
+                  enable_custom_sources: value,
                 })
               }
             />
@@ -68,35 +65,10 @@ export default function Experimental() {
                 description: "Show detailed logs for troubleshooting issues.",
                 type: "switch",
               }}
-              value={preferences.experimental.enable_debug_logging}
+              value={preferences.experimental_preferences.enable_debug_logging}
               onChange={(value) =>
-                updatePreferences({
-                  section: "experimental",
-                  key: "enable_debug_logging",
-                  value,
-                })
-              }
-            />
-          </SettingItem>
-
-          <SettingItem
-            title="Show FPS counter in reader"
-            description="Display performance metrics for testing"
-          >
-            <SettingRenderer
-              setting={{
-                key: "show_fps_counter",
-                title: "Show FPS counter in reader",
-                description:
-                  "Display performance metrics for testing purposes.",
-                type: "switch",
-              }}
-              value={preferences.experimental.show_fps_counter}
-              onChange={(value) =>
-                updatePreferences({
-                  section: "experimental",
-                  key: "show_fps_counter",
-                  value,
+                updateExperimentalPreferences({
+                  enable_debug_logging: value,
                 })
               }
             />
@@ -114,12 +86,10 @@ export default function Experimental() {
                   "Use GPU acceleration for image rendering (may cause issues on some systems).",
                 type: "switch",
               }}
-              value={preferences.experimental.hardware_acceleration}
+              value={preferences.experimental_preferences.hardware_acceleration}
               onChange={(value) =>
-                updatePreferences({
-                  section: "experimental",
-                  key: "hardware_acceleration",
-                  value,
+                updateExperimentalPreferences({
+                  hardware_acceleration: value,
                 })
               }
             />

@@ -1,12 +1,12 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { SettingItem } from "@/components/settings/settings-item";
 import { SettingRenderer } from "@/components/settings/settings-renderer";
-import { usePreferences } from "@/hooks/settings/use-settings";
+import { usePreferences } from "@/hooks/use-preferences";
 import { Paintbrush } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 
 export default function LayoutAppearance() {
-  const { preferences, updatePreferences } = usePreferences();
+  const { preferences, updateLayoutPreferences } = usePreferences();
   const { setTheme, theme } = useTheme();
 
   if (!preferences) return <div>Loading...</div>;
@@ -49,13 +49,10 @@ export default function LayoutAppearance() {
                   { value: "12", label: "12" },
                 ],
               }}
-              value={preferences.layout_appearance.grid_size}
+              value={preferences.layout_preferences.grid_size}
               onChange={(value) => {
-                const num = Number(value);
-                updatePreferences({
-                  section: "layout_appearance",
-                  key: "grid_size",
-                  value: num,
+                updateLayoutPreferences({
+                  grid_size: Number(value),
                 });
               }}
             />
@@ -99,12 +96,10 @@ export default function LayoutAppearance() {
                   { value: "shadow", label: "Shadow" },
                 ],
               }}
-              value={preferences.layout_appearance.cover_style}
+              value={preferences.layout_preferences.cover_style}
               onChange={(value) =>
-                updatePreferences({
-                  section: "layout_appearance",
-                  key: "cover_style",
-                  value,
+                updateLayoutPreferences({
+                  cover_style: value,
                 })
               }
             />
@@ -121,12 +116,10 @@ export default function LayoutAppearance() {
                 description: "Display manga titles below cover images.",
                 type: "switch",
               }}
-              value={preferences.layout_appearance.show_titles}
+              value={preferences.layout_preferences.show_titles}
               onChange={(value) =>
-                updatePreferences({
-                  section: "layout_appearance",
-                  key: "show_titles",
-                  value,
+                updateLayoutPreferences({
+                  show_titles: value,
                 })
               }
             />
@@ -144,12 +137,10 @@ export default function LayoutAppearance() {
                   "Use smaller margins and fonts for a denser layout.",
                 type: "switch",
               }}
-              value={preferences.layout_appearance.compact_mode}
+              value={preferences.layout_preferences.compact_mode}
               onChange={(value) =>
-                updatePreferences({
-                  section: "layout_appearance",
-                  key: "compact_mode",
-                  value,
+                updateLayoutPreferences({
+                  compact_mode: value,
                 })
               }
             />
@@ -167,12 +158,10 @@ export default function LayoutAppearance() {
                   "Display visual indicators for read and unread manga.",
                 type: "switch",
               }}
-              value={preferences.layout_appearance.show_read_indicators}
+              value={preferences.layout_preferences.show_read_indicator}
               onChange={(value) =>
-                updatePreferences({
-                  section: "layout_appearance",
-                  key: "show_read_indicators",
-                  value,
+                updateLayoutPreferences({
+                  show_read_indicator: value,
                 })
               }
             />

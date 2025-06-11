@@ -1,38 +1,37 @@
-import { usePreferences } from "@/hooks/settings/use-settings";
-
-type CoverStyle = "default" | "rounded" | "border" | "shadow";
+import { usePreferences } from "@/hooks/use-preferences";
 
 export function useCoverStyle() {
-  const { preferences, updatePreferences } = usePreferences();
+  const { preferences, updateLayoutPreferences } = usePreferences();
 
-  const coverStyle =
-    (preferences?.layout_appearance?.cover_style as CoverStyle) || "rounded";
-  const compactMode = preferences?.layout_appearance.compact_mode || false;
-  const showTitles = preferences?.layout_appearance.show_titles || false;
+  const grid = preferences?.layout_preferences.grid_size!;
+  const showTitles = preferences?.layout_preferences.show_titles!;
+  const compactMode = preferences?.layout_preferences.compact_mode!;
+  const coverStyle = preferences?.layout_preferences.cover_style!;
 
-  const setLayoutPreferences = (key: string, value: any) => {
-    updatePreferences({
-      section: "layout_appearance",
-      key,
-      value,
-    });
+  const setGrid = (size: number) => {
+    updateLayoutPreferences({ grid_size: size });
   };
 
-  const setCoverStyle = (value: string) =>
-    setLayoutPreferences("cover_style", value);
+  const setCompactMode = (compact: boolean) => {
+    updateLayoutPreferences({ compact_mode: compact });
+  };
 
-  const setCompactMode = (value: boolean) =>
-    setLayoutPreferences("compact_mode", value);
+  const setShowTitles = (show: boolean) => {
+    updateLayoutPreferences({ show_titles: show });
+  };
 
-  const setShowTitles = (value: boolean) =>
-    setLayoutPreferences("show_titles", value);
+  const setCoverStyle = (style: string) => {
+    updateLayoutPreferences({ cover_style: style });
+  };
 
   return {
-    coverStyle,
-    setCoverStyle,
-    compactMode,
-    setCompactMode,
+    grid,
     showTitles,
+    compactMode,
+    coverStyle,
+    setGrid,
     setShowTitles,
+    setCompactMode,
+    setCoverStyle,
   };
 }

@@ -1,11 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { SettingItem } from "@/components/settings/settings-item";
 import { SettingRenderer } from "@/components/settings/settings-renderer";
-import { usePreferences } from "@/hooks/settings/use-settings";
+import { usePreferences } from "@/hooks/use-preferences";
 import { Settings as SettingsIcon } from "lucide-react";
 
 export default function SystemBehavior() {
-  const { preferences, updatePreferences } = usePreferences();
+  const { preferences, updateSystemBehaviorPreferences } = usePreferences();
 
   if (!preferences) return <div>Loading...</div>;
 
@@ -35,34 +35,10 @@ export default function SystemBehavior() {
                   "Automatically check for updates when the app starts.",
                 type: "switch",
               }}
-              value={preferences.system_behavior.check_new_chapters}
+              value={preferences.system_behavior_preferences.update_on_startup}
               onChange={(value) =>
-                updatePreferences({
-                  section: "system_behavior",
-                  key: "check_new_chapters",
-                  value,
-                })
-              }
-            />
-          </SettingItem>
-
-          <SettingItem
-            title="Auto-refresh category when focused"
-            description="Refresh manga list when switching to a category"
-          >
-            <SettingRenderer
-              setting={{
-                key: "auto_refresh_category",
-                title: "Auto-refresh category when focused",
-                description: "Refresh manga list when switching to a category.",
-                type: "switch",
-              }}
-              value={preferences.system_behavior.auto_refresh_category}
-              onChange={(value) =>
-                updatePreferences({
-                  section: "system_behavior",
-                  key: "auto_refresh_category",
-                  value,
+                updateSystemBehaviorPreferences({
+                  update_on_startup: value,
                 })
               }
             />
@@ -79,12 +55,10 @@ export default function SystemBehavior() {
                 description: "Show confirmation dialog when removing manga.",
                 type: "switch",
               }}
-              value={preferences.system_behavior.confirm_removal}
+              value={preferences.system_behavior_preferences.confirm_removal}
               onChange={(value) =>
-                updatePreferences({
-                  section: "system_behavior",
-                  key: "confirm_removal",
-                  value,
+                updateSystemBehaviorPreferences({
+                  confirm_removal: value,
                 })
               }
             />
@@ -102,12 +76,12 @@ export default function SystemBehavior() {
                   "Show system notifications when new chapters are added.",
                 type: "switch",
               }}
-              value={preferences.system_behavior.enable_notifications}
+              value={
+                preferences.system_behavior_preferences.enable_notifications
+              }
               onChange={(value) =>
-                updatePreferences({
-                  section: "system_behavior",
-                  key: "enable_notifications",
-                  value,
+                updateSystemBehaviorPreferences({
+                  enable_notifications: value,
                 })
               }
             />

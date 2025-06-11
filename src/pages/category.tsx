@@ -1,12 +1,12 @@
 import { CategoryCard } from "@/components/manga-card";
 import { Button } from "@/components/ui/button";
-import LIBRARY_HOOKS from "@/hooks/use-library";
+import { useCategory } from "@/hooks/use-library";
 import { cn } from "@/lib/utils";
 import { useParams } from "react-router";
-import { useGrid } from "@/hooks/settings/use-grid";
 import { Loader2, Trash2, Brush } from "lucide-react";
 import { useLibraryItemSelect } from "@/store/category-select";
 import React from "react";
+import { useCoverStyle } from "@/hooks/settings/use-cover-style";
 
 function ErrorFallback({
   error,
@@ -41,10 +41,9 @@ function Loading() {
 }
 
 export default function Category() {
-  const { grid } = useGrid();
+  const { grid } = useCoverStyle();
   const { slug } = useParams<{ slug: string }>();
-  const { data, isLoading, error, refetch, isRefetching } =
-    LIBRARY_HOOKS.useFetchCategory(slug);
+  const { data, isLoading, error, refetch, isRefetching } = useCategory(slug!);
   const [isSelecting, setIsSelecting] = React.useState<boolean>(false);
   const { selectedItems, clearSelection } = useLibraryItemSelect();
 

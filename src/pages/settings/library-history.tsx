@@ -1,11 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { SettingItem } from "@/components/settings/settings-item";
 import { SettingRenderer } from "@/components/settings/settings-renderer";
-import { usePreferences } from "@/hooks/settings/use-settings";
+import { usePreferences } from "@/hooks/use-preferences";
 import { Library } from "lucide-react";
 
 export default function LibraryHistory() {
-  const { preferences, updatePreferences } = usePreferences();
+  const { preferences, updateLibraryHistoryPreferences } = usePreferences();
 
   if (!preferences) return <div>Loading...</div>;
 
@@ -34,12 +34,10 @@ export default function LibraryHistory() {
                 description: "Track and save your reading progress.",
                 type: "switch",
               }}
-              value={preferences.library_history.enable_history}
+              value={preferences.library_history_preferences.enabled}
               onChange={(value) =>
-                updatePreferences({
-                  section: "library_history",
-                  key: "enable_history",
-                  value,
+                updateLibraryHistoryPreferences({
+                  enabled: value,
                 })
               }
             />
@@ -62,12 +60,10 @@ export default function LibraryHistory() {
                   { value: "unlimited", label: "Unlimited" },
                 ],
               }}
-              value={preferences.library_history.max_history_entries}
+              value={preferences.library_history_preferences.max_entries}
               onChange={(value) =>
-                updatePreferences({
-                  section: "library_history",
-                  key: "max_history_entries",
-                  value,
+                updateLibraryHistoryPreferences({
+                  max_entries: Number(value),
                 })
               }
             />
@@ -84,12 +80,10 @@ export default function LibraryHistory() {
                 description: "Display recently read manga on the home page.",
                 type: "switch",
               }}
-              value={preferences.library_history.show_recently_read}
+              value={preferences.library_history_preferences.show_recent}
               onChange={(value) =>
-                updatePreferences({
-                  section: "library_history",
-                  key: "show_recently_read",
-                  value,
+                updateLibraryHistoryPreferences({
+                  show_recent: value,
                 })
               }
             />
@@ -111,12 +105,12 @@ export default function LibraryHistory() {
                   { value: "compact", label: "Compact" },
                 ],
               }}
-              value={preferences.library_history.default_library_view}
+              value={
+                preferences.library_history_preferences.default_library_view
+              }
               onChange={(value) =>
-                updatePreferences({
-                  section: "library_history",
-                  key: "default_library_view",
-                  value,
+                updateLibraryHistoryPreferences({
+                  default_library_view: value,
                 })
               }
             />

@@ -1,16 +1,17 @@
-import { usePreferences } from "@/hooks/settings/use-settings";
+import { usePreferences } from "@/hooks/use-preferences";
 import { useEffect } from "react";
 
 type Theme = "dark" | "light" | "system";
 
 export function useTheme() {
-  const { preferences, updatePreferences, isLoading, isUpdating } =
+  const { preferences, updateLayoutPreferences, loading, isUpdating, error } =
     usePreferences();
+  console.log("Error", error);
 
-  const theme = (preferences?.layout_appearance?.theme as Theme) || "system";
+  const theme = (preferences?.layout_preferences?.theme as Theme) || "system";
 
   useEffect(() => {
-    if (isLoading || isUpdating) return;
+    if (loading || isUpdating) return;
 
     const root = window.document.documentElement;
     root.classList.remove("light", "dark");
@@ -24,7 +25,7 @@ export function useTheme() {
     } else {
       root.classList.add(theme);
     }
-  }, [theme, isLoading, isUpdating]);
+  }, [theme, loading, isUpdating]);
 
   useEffect(() => {
     if (theme !== "system") return;
@@ -41,16 +42,12 @@ export function useTheme() {
   }, [theme]);
 
   const setTheme = (newTheme: Theme) => {
-    updatePreferences({
-      section: "layout_appearance",
-      key: "theme",
-      value: newTheme,
-    });
+    updateLayoutPreferences({ theme: newTheme });
   };
 
   return {
     theme,
     setTheme,
-    isLoading: isLoading || isUpdating,
+    isLoading: loading || isUpdating,
   };
 }

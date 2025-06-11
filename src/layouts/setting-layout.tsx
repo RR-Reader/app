@@ -27,11 +27,6 @@ const settingsNavigation = [
     icon: Library,
   },
   {
-    title: "Storage & Caching",
-    href: "/settings/storage-caching",
-    icon: HardDrive,
-  },
-  {
     title: "System & Behavior",
     href: "/settings/system-behavior",
     icon: SettingsIcon,

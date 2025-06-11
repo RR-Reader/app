@@ -24,13 +24,17 @@ import {
   SidebarMenuSubItem,
 } from "../ui/sidebar";
 import { Link, useLocation } from "react-router";
-import LIBRARY_HOOKS from "@/hooks/use-library";
+import { useLibrary } from "@/hooks/use-library";
 import { cn } from "@/lib/utils";
 import { NavCreateCategoryDialog } from "./nav-create-cat";
 
 export function NavMain() {
-  const { data } = LIBRARY_HOOKS.useLoadLibrary();
+  const { data, error } = useLibrary();
   const { pathname } = useLocation();
+
+  if (error) {
+    console.error("Failed to load library data:", error);
+  }
 
   type SidebarSubPath = {
     name: string;

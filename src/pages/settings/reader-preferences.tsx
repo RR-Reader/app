@@ -1,13 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { SettingItem } from "@/components/settings/settings-item";
 import { SettingRenderer } from "@/components/settings/settings-renderer";
-import { usePreferences } from "@/hooks/settings/use-settings";
+import { usePreferences } from "@/hooks/use-preferences";
 import { BookOpen } from "lucide-react";
 import { Stepper } from "@/components/stepper";
 import { useState } from "react";
 
 export default function ReaderPreferences() {
-  const { preferences, updatePreferences } = usePreferences();
+  const { preferences, updateReaderPreferences } = usePreferences();
   const [stepNum, setStepNum] = useState(100);
 
   if (!preferences) return <div>Loading...</div>;
@@ -42,12 +42,10 @@ export default function ReaderPreferences() {
                   { value: "vertical-scroll", label: "Vertical scroll" },
                 ],
               }}
-              value={preferences.reader_display.page_layout}
+              value={preferences.reader_display_preferences.page_layout}
               onChange={(value) =>
-                updatePreferences({
-                  section: "reader_display",
-                  key: "page_layout",
-                  value,
+                updateReaderPreferences({
+                  page_layout: value,
                 })
               }
             />
@@ -69,23 +67,26 @@ export default function ReaderPreferences() {
                   { value: "manual", label: "Manual" },
                 ],
               }}
-              value={preferences.reader_display.zoom_behavior}
+              value={preferences.reader_display_preferences.zoom_behavior}
               onChange={(value) =>
-                updatePreferences({
-                  section: "reader_display",
-                  key: "zoom_behavior",
-                  value,
+                updateReaderPreferences({
+                  zoom_behavior: value,
                 })
               }
             />
           </SettingItem>
 
-          {preferences.reader_display.zoom_behavior === "manual" && (
+          {preferences.reader_display_preferences.zoom_behavior ===
+            "manual" && (
             <SettingItem title="Zoom Level" description="Adjust zoom level">
               <Stepper
                 max={200}
-                value={stepNum}
-                onChange={setStepNum}
+                value={preferences.reader_display_preferences.zoom_level || 100}
+                onChange={(value) => {
+                  updateReaderPreferences({
+                    zoom_level: value,
+                  });
+                }}
                 step={25}
               />
             </SettingItem>
@@ -107,12 +108,10 @@ export default function ReaderPreferences() {
                   { value: "rtl", label: "Right-to-left" },
                 ],
               }}
-              value={preferences.reader_display.reading_direction}
+              value={preferences.reader_display_preferences.reading_direction}
               onChange={(value) =>
-                updatePreferences({
-                  section: "reader_display",
-                  key: "reading_direction",
-                  value,
+                updateReaderPreferences({
+                  reading_direction: value,
                 })
               }
             />
@@ -129,85 +128,10 @@ export default function ReaderPreferences() {
                 description: "Save zoom level between reading sessions.",
                 type: "switch",
               }}
-              value={preferences.reader_display.remember_zoom}
+              value={preferences.reader_display_preferences.remember_zoom}
               onChange={(value) =>
-                updatePreferences({
-                  section: "reader_display",
-                  key: "remember_zoom",
-                  value,
-                })
-              }
-            />
-          </SettingItem>
-
-          <SettingItem
-            title="Show page numbers"
-            description="Display current page number in reader"
-          >
-            <SettingRenderer
-              setting={{
-                key: "show_page_numbers",
-                title: "Show page numbers",
-                description: "Display current page number in the reader.",
-                type: "switch",
-              }}
-              value={preferences.reader_display.show_page_numbers}
-              onChange={(value) =>
-                updatePreferences({
-                  section: "reader_display",
-                  key: "show_page_numbers",
-                  value,
-                })
-              }
-            />
-          </SettingItem>
-
-          <SettingItem
-            title="Background Color"
-            description="Reader background color"
-          >
-            <SettingRenderer
-              setting={{
-                key: "background_color",
-                title: "Background Color",
-                description: "Choose the background color for the reader.",
-                type: "select",
-                options: [
-                  { value: "black", label: "Black" },
-                  { value: "white", label: "White" },
-                  { value: "sepia", label: "Sepia" },
-                  { value: "custom", label: "Custom" },
-                ],
-              }}
-              value={preferences.reader_display.background_color}
-              onChange={(value) =>
-                updatePreferences({
-                  section: "reader_display",
-                  key: "background_color",
-                  value,
-                })
-              }
-            />
-          </SettingItem>
-
-          <SettingItem
-            title="Preload next chapter"
-            description="Load next chapter in background for faster navigation"
-          >
-            <SettingRenderer
-              setting={{
-                key: "preload_next",
-                title: "Preload next chapter",
-                description:
-                  "Load next chapter in background for faster navigation.",
-                type: "switch",
-              }}
-              value={preferences.reader_display.preload_next}
-              onChange={(value) =>
-                updatePreferences({
-                  section: "reader_display",
-                  key: "preload_next",
-                  value,
+                updateReaderPreferences({
+                  remember_zoom: value,
                 })
               }
             />
