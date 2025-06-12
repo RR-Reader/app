@@ -62,7 +62,6 @@ class ExtensionsService {
   private static remoteSourcesList: RemoteSourcesList | null = null;
 
   static async ensureExtensionsDirectory(): Promise<void> {
-    // Ensure main extensions directory
     const dirExists = await exists(ExtensionsService.EXTENSIONS_DIR, {
       baseDir: BaseDirectory.AppData,
     });
@@ -86,7 +85,6 @@ class ExtensionsService {
       );
     }
 
-    // Ensure remote extensions cache directory
     const remoteCacheExists = await exists(ExtensionsService.REMOTE_CACHE_DIR, {
       baseDir: BaseDirectory.AppData,
     });
@@ -109,7 +107,6 @@ class ExtensionsService {
       const sourcesList: RemoteSourcesList = await response.json();
       ExtensionsService.remoteSourcesList = sourcesList;
 
-      // Cache the sources list locally
       await writeTextFile(
         `${ExtensionsService.REMOTE_CACHE_DIR}/sources-list.json`,
         JSON.stringify(sourcesList, null, 2),
@@ -120,7 +117,6 @@ class ExtensionsService {
     } catch (error) {
       console.error("Failed to fetch remote sources list:", error);
 
-      // Try to load from cache
       try {
         const cachedContent = await readTextFile(
           `${ExtensionsService.REMOTE_CACHE_DIR}/sources-list.json`,
@@ -149,7 +145,6 @@ class ExtensionsService {
     remoteSource: RemoteSourceInfo,
   ): Promise<LoadedExtension> {
     try {
-      // Download the extension code
       const response = await fetch(remoteSource.sourceUrl);
       if (!response.ok) {
         throw new Error(`Failed to download extension: ${response.status}`);
@@ -157,7 +152,6 @@ class ExtensionsService {
 
       const extensionCode = await response.text();
 
-      // Cache the extension code locally
       const cacheFileName = `${remoteSource.id}.ts`;
       const cachePath = `${ExtensionsService.REMOTE_CACHE_DIR}/${cacheFileName}`;
 
@@ -165,7 +159,6 @@ class ExtensionsService {
         baseDir: BaseDirectory.AppData,
       });
 
-      // Load the extension
       const sourceProvider =
         await ExtensionsService.importRemoteExtension(cachePath);
 
@@ -197,10 +190,8 @@ class ExtensionsService {
         source: sourceProvider,
       };
 
-      // Add to loaded extensions
       ExtensionsService.loadedExtensions.set(remoteSource.id, loadedExtension);
 
-      // Update manifest
       await ExtensionsService.addExtensionToManifest(extensionInfo);
 
       return loadedExtension;
@@ -227,7 +218,6 @@ class ExtensionsService {
       );
     }
 
-    // Find the remote source info for version checking
     const remoteSources = await ExtensionsService.getAvailableRemoteSources();
     const remoteSource = remoteSources.find(
       (source) => source.id === extensionId,
@@ -237,22 +227,18 @@ class ExtensionsService {
       throw new Error(`Remote source ${extensionId} not found in sources list`);
     }
 
-    // Check if update is needed
     if (extensionInfo.version === remoteSource.version) {
       console.log(`Extension ${extensionId} is already up to date`);
       return ExtensionsService.loadedExtensions.get(extensionId)!;
     }
 
-    // Reinstall with new version
     await ExtensionsService.uninstallRemoteExtension(extensionId);
     return await ExtensionsService.installRemoteExtension(remoteSource);
   }
 
   static async uninstallRemoteExtension(extensionId: string): Promise<void> {
-    // Remove from loaded extensions
     ExtensionsService.loadedExtensions.delete(extensionId);
 
-    // Remove cached file
     const cacheFileName = `${extensionId}.ts`;
     const cachePath = `${ExtensionsService.REMOTE_CACHE_DIR}/${cacheFileName}`;
 
@@ -261,14 +247,12 @@ class ExtensionsService {
         baseDir: BaseDirectory.AppData,
       });
       if (fileExists) {
-        // Note: We'd need to implement file deletion in Tauri
-        // For now, we'll just mark it as uninstalled in the manifest
+        // TODO: We'd need to implement file deletion in Tauri
       }
     } catch (error) {
       console.error(`Failed to delete cached extension file: ${error}`);
     }
 
-    // Remove from manifest
     await ExtensionsService.removeExtensionFromManifest(extensionId);
   }
 
@@ -297,7 +281,6 @@ class ExtensionsService {
     await ExtensionsService.ensureExtensionsDirectory();
     const loadedExtensions: LoadedExtension[] = [];
 
-    // Load local extensions
     try {
       const extensionDirs = await readDir(ExtensionsService.EXTENSIONS_DIR, {
         baseDir: BaseDirectory.AppData,
@@ -325,7 +308,6 @@ class ExtensionsService {
       console.error("Failed to load local extensions:", error);
     }
 
-    // Load remote extensions from cache
     try {
       const manifest = await ExtensionsService.loadManifest();
       const remoteExtensions = manifest.extensions.filter(
@@ -486,8 +468,6 @@ class ExtensionsService {
     }
   }
 
-  // ... (keep all existing methods like loadManifest, toggleExtension, etc.)
-
   static async loadManifest(): Promise<ExtensionManifest> {
     await ExtensionsService.ensureExtensionsDirectory();
 
@@ -521,7 +501,6 @@ class ExtensionsService {
           baseDir: BaseDirectory.AppData,
         });
 
-        // Update loaded extension
         const loadedExtension =
           ExtensionsService.loadedExtensions.get(extensionId);
         if (loadedExtension) {
